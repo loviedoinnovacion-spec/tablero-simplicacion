@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programa de Simplificación Administrativa — MCyP Corrientes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+  :root {
+    --azul:#0D2B5E; --azul-med:#1A4A9E; --azul-cl:#2E6DD4;
+    --oro:#C8960C; --oro-lt:#F5C842;
+    --verde:#1B6B3A; --verde-cl:#27AE60;
+    --rojo:#C0392B; --naranja:#E67E22;
+    --bg:#F0F2F7; --texto:#1A1A2E; --sec:#4A5578;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--texto);min-height:100vh}
+
+  /* HEADER */
+  header{background:var(--azul);padding:26px 44px 0;overflow:hidden;position:relative}
+  header::before{content:'';position:absolute;top:-50px;right:-50px;width:260px;height:260px;border-radius:50%;background:rgba(200,150,12,0.09)}
+  .hdr-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;position:relative;z-index:1;padding-bottom:18px}
+  .hdr-badge{background:var(--oro);color:var(--azul);font-family:'Syne',sans-serif;font-weight:800;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-bottom:9px;display:inline-block}
+  .hdr-title{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px}
+  .hdr-sub{font-size:11px;color:rgba(255,255,255,0.5);font-weight:300}
+  .hdr-meta{text-align:right;flex-shrink:0}
+  .hdr-meta strong{display:block;font-family:'Syne',sans-serif;font-size:30px;color:var(--oro-lt);font-weight:800;line-height:1}
+  .hdr-meta span{font-size:11px;color:rgba(255,255,255,0.45)}
+  .stats-bar{display:flex;border-top:1px solid rgba(255,255,255,0.07);position:relative;z-index:1}
+  .sb{flex:1;padding:11px 16px;border-right:1px solid rgba(255,255,255,0.06)}
+  .sb:last-child{border-right:none}
+  .sb .n{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--oro-lt)}
+  .sb .l{font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px}
+
+  /* TABS */
+  .tabs{background:var(--azul);padding:0 44px;display:flex;border-top:1px solid rgba(255,255,255,0.06)}
+  .tab{padding:11px 18px;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.38);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap}
+  .tab:hover{color:rgba(255,255,255,0.7)}
+  .tab.active{color:var(--oro-lt);border-bottom-color:var(--oro)}
+
+  /* MAIN */
+  main{padding:30px 44px 56px}
+  .panel{display:none;animation:fi .3s ease}
+  .panel.active{display:block}
+  @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 2px var(--oro)}50%{box-shadow:0 0 0 5px rgba(200,150,12,0.22)}}
+  .sec-title{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--azul-cl);margin-bottom:16px;padding-bottom:7px;border-bottom:1px solid #DDE3F0}
+
+  /* FILTROS */
+  .filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+  .fl{font-size:10px;color:var(--sec);font-weight:600;text-transform:uppercase;letter-spacing:1px}
+  .fbtn{padding:5px 12px;border-radius:20px;border:1px solid #D0D6E8;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:var(--sec);transition:all .15s;font-family:'DM Sans',sans-serif}
+  .fbtn:hover{border-color:var(--azul-cl);color:var(--azul-cl)}
+  .fbtn.active{background:var(--azul);color:#fff;border-color:var(--azul)}
+  .fbtn.ext.active{background:var(--azul-cl);border-color:var(--azul-cl)}
+  .fbtn.int.active{background:#6B7280;border-color:#6B7280}
+  .fbtn.fverde.active{background:var(--verde-cl);border-color:var(--verde-cl)}
+  .fbtn.famarillo.active{background:var(--naranja);border-color:var(--naranja)}
+  .fbtn.frojo.active{background:var(--rojo);border-color:var(--rojo)}
+  .sep{width:1px;height:26px;background:#DDE3F0;margin:0 3px}
+
+  /* GRID */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+  .no-res{text-align:center;padding:56px 20px;color:var(--sec);font-size:13px}
+
+  /* CARD */
+  .tc{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.07);overflow:hidden;cursor:pointer;transition:box-shadow .2s,transform .15s;border-left:4px solid #DDE3F0;position:relative}
+  .tc:hover{box-shadow:0 4px 14px rgba(0,0,0,0.11);transform:translateY(-1px)}
+  .tc.externo{border-left-color:var(--azul-cl)}
+  .tc.interno{border-left-color:#9CA3AF}
+  .tc.sv{border-left-color:var(--verde-cl)}
+  .tc.sa{border-left-color:var(--naranja)}
+  .tc.sr{border-left-color:var(--rojo)}
+  .tc.si{border-left-color:#9CA3AF}
+  .pinc{background:#F4F4F8;color:#555}
+  .sem-b.incompleto{background:#F4F4F8;color:#555}
+  .incompleto .sd{background:#9CA3AF}
+
+  .tc-head{padding:14px 16px 10px}
+  .tc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px}
+  .tc-nombre{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);line-height:1.35;flex:1}
+  .tc-tipo{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:20px;flex-shrink:0}
+  .tc-tipo.externo{background:#E3EDFF;color:var(--azul-med)}
+  .tc-tipo.interno{background:#F3F4F6;color:#6B7280}
+  .tc-area{font-size:10px;color:var(--sec);margin-bottom:6px}
+  .tc-desc{font-size:11px;color:var(--sec);line-height:1.55}
+  .tc-pills{display:flex;gap:5px;flex-wrap:wrap;padding:8px 16px 12px;border-top:1px solid #F0F2F7}
+  .pill{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500}
+  .pt{background:#EEF0F6;color:#555}
+  .pm{background:#FEF3D7;color:#8B6200}
+  .pv{background:#E8F5E9;color:var(--verde)}
+  .pverde{background:#E8F5E9;color:var(--verde)}
+  .pamar{background:#FEF3E2;color:#7B4A00}
+  .projo{background:#FDECEC;color:var(--rojo)}
+  .tc-exp{font-size:10px;color:var(--azul-cl);padding:0 16px 10px;font-weight:600;display:flex;align-items:center;gap:4px;user-select:none}
+  .tc-exp::after{content:'▼';font-size:7px;transition:transform .2s}
+  .tc.open .tc-exp::after{transform:rotate(180deg)}
+
+  /* DETALLE */
+  .tc-det{display:none;border-top:2px solid #EEF0F6;background:#FAFBFF}
+  .tc.open .tc-det{display:block}
+  .dt-tabs{display:flex;border-bottom:1px solid #EEF0F6}
+  .dt-tab{padding:7px 13px;font-size:10px;font-weight:600;color:var(--sec);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+  .dt-tab.active{color:var(--azul);border-bottom-color:var(--azul)}
+  .dt-panel{display:none;padding:13px 16px}
+  .dt-panel.active{display:block}
+
+  .dr{display:flex;gap:8px;margin-bottom:7px;align-items:flex-start}
+  .dk{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--sec);min-width:110px;flex-shrink:0;padding-top:2px}
+  .dv{font-size:11px;color:var(--texto);line-height:1.6}
+
+  .pm-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start}
+  .pm-n{width:19px;height:19px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  .pm-t{font-size:11px;color:var(--sec);line-height:1.55}
+
+  .ki{background:#fff;border:1px solid #EEF0F6;border-radius:6px;padding:9px 11px;margin-bottom:5px}
+  .kn{font-size:11px;font-weight:600;color:var(--azul);margin-bottom:2px}
+  .kd{font-size:10px;color:var(--sec);line-height:1.5}
+  .km{font-size:10px;color:var(--verde-cl);font-weight:600;margin-top:2px}
+
+  .prob{background:#FEF3D7;border-left:3px solid var(--oro);padding:9px 11px;border-radius:0 6px 6px 0;margin-top:7px}
+  .prob strong{display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--oro);margin-bottom:2px}
+  .prob p{font-size:11px;color:#5A3E00;line-height:1.6}
+
+  .sem-b{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;margin-bottom:9px}
+  .sem-b.verde{background:#E8F5E9;color:var(--verde)}
+  .sem-b.amarillo{background:#FEF3E2;color:#7B4A00}
+  .sem-b.rojo{background:#FDECEC;color:var(--rojo)}
+  .sd{width:7px;height:7px;border-radius:50%}
+  .verde .sd{background:var(--verde-cl)} .amarillo .sd{background:var(--naranja)} .rojo .sd{background:var(--rojo)}
+
+  /* RECOM */
+  .rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:13px;margin-bottom:26px}
+  .rec{background:#fff;border-radius:10px;padding:17px;box-shadow:0 1px 4px rgba(0,0,0,0.06);position:relative}
+  .rec-icon{font-size:22px;margin-bottom:7px}
+  .rec-titulo{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:5px}
+  .rec-texto{font-size:11px;color:var(--sec);line-height:1.7}
+  .rec-urg{position:absolute;top:11px;right:11px;font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:#FDECEC;color:var(--rojo)}
+  .next-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:13px}
+  .next{background:var(--azul);border-radius:10px;padding:17px;color:#fff;position:relative;overflow:hidden}
+  .next::after{content:attr(data-n);position:absolute;right:-6px;bottom:-14px;font-family:'Syne',sans-serif;font-size:68px;font-weight:800;color:rgba(255,255,255,0.05);line-height:1}
+  .nx-num{font-family:'Syne',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--oro-lt);margin-bottom:5px}
+  .nx-tit{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:5px;line-height:1.3}
+  .nx-txt{font-size:11px;color:rgba(255,255,255,0.58);line-height:1.6}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-badge">Gobierno de Corrientes</div>
+      <div class="hdr-title">Programa de Simplificación Administrativa<br>y Mejora de Experiencia del Ciudadano</div>
+      <div class="hdr-sub">Ministerio de Coordinación y Planificación · Relevamiento de procesos — Mayo 2026</div>
+    </div>
+    <div class="hdr-meta">
+      <strong>21</strong>
+      <span>trámites relevados<br>Actualizado: 27/05/2026</span>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="sb"><div class="n">8</div><div class="l">Áreas</div></div>
+    <div class="sb"><div class="n">9</div><div class="l">Externos 🌐</div></div>
+    <div class="sb"><div class="n">8</div><div class="l">Internos 🔒</div></div>
+    <div class="sb"><div class="n">4</div><div class="l">🟢 Publicar</div></div>
+    <div class="sb"><div class="n">4</div><div class="l">🟡 Revisar</div></div>
+    <div class="sb"><div class="n">9</div><div class="l">🔴 Mejorar</div></div>
+    <div class="sb"><div class="n">4</div><div class="l">⚫ Incompleto</div></div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('cronograma',this)">📅 Cronograma</div>
+  <div class="tab" onclick="showTab('tramites',this)">📋 Trámites relevados</div>
+  <div class="tab" onclick="showTab('semaforo',this)">🚦 Semáforo</div>
+  <div class="tab" onclick="showTab('guia',this)">🌐 Guía al Ciudadano</div>
+  <div class="tab" onclick="showTab('recomendaciones',this)">💡 Recomendaciones</div>
+</div>
+
+<main>
+
+  <!-- ══ CRONOGRAMA ══════════════════════════════════════ -->
+  <div class="panel active" id="cronograma">
+    <div class="sec-title">Hoja de ruta del programa — Mayo 2026</div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:28px">
+      <div style="background:#fff;border-radius:10px;padding:16px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:4px solid var(--verde-cl)">
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--verde-cl)">1</div>
+        <div style="font-size:10px;color:var(--sec);text-transform:uppercase;letter-spacing:1px">Semana completada<br>Diseño e instalación</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:16px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:4px solid var(--azul-cl)">
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--azul-cl)">8</div>
+        <div style="font-size:10px;color:var(--sec);text-transform:uppercase;letter-spacing:1px">Trámites relevados<br>en 2da semana</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:16px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:4px solid var(--oro)">
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--oro)">5</div>
+        <div style="font-size:10px;color:var(--sec);text-transform:uppercase;letter-spacing:1px">Trámites externos<br>para la guía web</div>
+      </div>
+      <div style="background:#fff;border-radius:10px;padding:16px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:4px solid var(--rojo)">
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--rojo)">3</div>
+        <div style="font-size:10px;color:var(--sec);text-transform:uppercase;letter-spacing:1px">Trámites internos<br>para mejora de proceso</div>
+      </div>
+    </div>
+
+    <div style="position:relative;padding-left:30px">
+      <div style="position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:linear-gradient(to bottom,var(--azul-cl),var(--oro))"></div>
+
+      <!-- SEMANA 1 -->
+      <div style="position:relative;margin-bottom:28px">
+        <div style="position:absolute;left:-27px;top:13px;width:13px;height:13px;border-radius:50%;background:var(--verde-cl);border:3px solid #fff;box-shadow:0 0 0 2px var(--verde-cl)"></div>
+        <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sec);margin-bottom:5px">Primera semana — 5 al 9 de mayo 2026</div>
+        <div style="background:#fff;border-radius:8px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-left:4px solid var(--verde-cl)">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);margin-bottom:6px">🏗️ Creación e instalación del Programa</div>
+          <div style="font-size:12px;color:var(--sec);line-height:1.65;margin-bottom:10px">Se crea formalmente el <strong>Programa de Simplificación Administrativa y Mejora de Experiencia del Ciudadano</strong>. Se diseña la metodología de relevamiento, el formulario de ficha de trámite y el esquema de bloques temáticos para la Guía de Trámites. Se realiza la presentación institucional ante las áreas del Ministerio y se asignan referentes por sector.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ Programa creado</span>
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ Formulario diseñado</span>
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ Referentes asignados</span>
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ Metodología aprobada</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEMANA 2 -->
+      <div style="position:relative;margin-bottom:28px">
+        <div style="position:absolute;left:-27px;top:13px;width:13px;height:13px;border-radius:50%;background:var(--oro);border:3px solid #fff;box-shadow:0 0 0 2px var(--oro);animation:pulse 1.5s infinite"></div>
+        <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sec);margin-bottom:5px">Segunda semana — 12 al 16 de mayo 2026 ← EN CURSO</div>
+        <div style="background:#fff;border-radius:8px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-left:4px solid var(--oro)">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);margin-bottom:6px">🔍 Relevamiento por área</div>
+          <div style="font-size:12px;color:var(--sec);line-height:1.65;margin-bottom:10px">Cada referente completa la ficha de relevamiento para los trámites más importantes de su área. Se clasifica cada trámite como <strong>externo</strong> (interactúa con el ciudadano → se publica) o <strong>interno</strong> (gestión entre áreas → mejora de proceso). Áreas relevadas: Mesa de Entradas, Dirección de RR. Internacionales, Área de Compras, Departamento de RRHH y Subsecretaría de Proyectos y Planificación Urbana. Total: 12 trámites relevados.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ Mesa de Entradas (1)</span>
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ RR. Internacionales (1)</span>
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ Compras (6)</span>
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ RRHH (3)</span>
+            <span style="background:#E8F5E9;color:var(--verde);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">✓ Plan. Urbana (1)</span>
+            <span style="background:#E3EDFF;color:var(--azul-med);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">⏳ Subsec. Modernización</span>
+            <span style="background:#E3EDFF;color:var(--azul-med);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">⏳ Asesoría Legal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEMANA 3 -->
+      <div style="position:relative;margin-bottom:28px;opacity:.75">
+        <div style="position:absolute;left:-27px;top:13px;width:13px;height:13px;border-radius:50%;background:#BCC5D8;border:3px solid #fff;box-shadow:0 0 0 2px #BCC5D8"></div>
+        <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sec);margin-bottom:5px">Tercera semana — 19 al 23 de mayo 2026</div>
+        <div style="background:#fff;border-radius:8px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-left:4px solid #BCC5D8">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);margin-bottom:6px">📝 Consolidación y armado de la Guía de Trámites</div>
+          <div style="font-size:12px;color:var(--sec);line-height:1.65;margin-bottom:10px">Con la información de los relevamientos se arma la Guía de Trámites: versión ciudadana (trámites externos, para publicar en la web) y versión interna (análisis de procesos). Se definen los trámites prioritarios para la primera publicación.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:#F0F2F7;color:var(--sec);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">Guía web ciudadana</span>
+            <span style="background:#F0F2F7;color:var(--sec);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">Informe diagnóstico interno</span>
+            <span style="background:#F0F2F7;color:var(--sec);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">Priorización digitalización</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEMANA 4 -->
+      <div style="position:relative;opacity:.65">
+        <div style="position:absolute;left:-27px;top:13px;width:13px;height:13px;border-radius:50%;background:#BCC5D8;border:3px solid #fff;box-shadow:0 0 0 2px #BCC5D8"></div>
+        <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--sec);margin-bottom:5px">Cuarta semana — 26 al 30 de mayo 2026</div>
+        <div style="background:#fff;border-radius:8px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-left:4px solid #BCC5D8">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);margin-bottom:6px">🚀 Publicación y presentación al Instituto de Modernización</div>
+          <div style="font-size:12px;color:var(--sec);line-height:1.65;margin-bottom:10px">Publicación de la Guía de Trámites en la web del Ministerio. Presentación de resultados y hoja de ruta de digitalización ante el Instituto de Modernización del Estado con OKR del trimestre.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span style="background:#F0F2F7;color:var(--sec);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">Publicación web</span>
+            <span style="background:#F0F2F7;color:var(--sec);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">Presentación IME</span>
+            <span style="background:#F0F2F7;color:var(--sec);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px">OKR trimestral</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TRAMITES ══════════════════════════════════════ -->
+  <div class="panel" id="tramites">
+    <div class="sec-title">Trámites relevados — Filtrá por área, tipo o estado de semáforo</div>
+
+    <div class="filtros">
+      <span class="fl">Área:</span>
+      <button class="fbtn active" onclick="setF('area','todos',this)">Todos</button>
+      <button class="fbtn" onclick="setF('area','mesa',this)">Mesa Entradas</button>
+      <button class="fbtn" onclick="setF('area','compras',this)">Compras</button>
+      <button class="fbtn" onclick="setF('area','admin',this)">Dir. Admin.</button>
+      <button class="fbtn" onclick="setF('area','rr',this)">RR. Int.</button>
+      <button class="fbtn" onclick="setF('area','rrhh',this)">RRHH</button>
+      <button class="fbtn" onclick="setF('area','planif',this)">Plan. Urbana</button>
+      <button class="fbtn" onclick="setF('area','girsu',this)">GIRSU</button>
+      <button class="fbtn" onclick="setF('area','relinst',this)">Rel. Institucionales</button>
+    </div>
+    <div class="filtros" style="margin-top:-10px">
+      <span class="fl">Tipo:</span>
+      <button class="fbtn fbtn-tipo fbtn-tipo-todos active" onclick="setF('tipo','todos',this)">Todos</button>
+      <button class="fbtn fbtn-tipo ext" onclick="setF('tipo','externo',this)">🌐 Externo</button>
+      <button class="fbtn fbtn-tipo int" onclick="setF('tipo','interno',this)">🔒 Interno</button>
+      <div class="sep"></div>
+      <span class="fl">Estado:</span>
+      <button class="fbtn active" onclick="setF('sem','todos',this)">Todos</button>
+      <button class="fbtn fverde"    onclick="setF('sem','v',this)">🟢 Publicar</button>
+      <button class="fbtn famarillo" onclick="setF('sem','a',this)">🟡 Revisar</button>
+      <button class="fbtn frojo"     onclick="setF('sem','r',this)">🔴 Mejorar</button>
+      <button class="fbtn" style="background:#F4F4F8;border-color:#9CA3AF;color:#555" onclick="setF('sem','i',this)">⚫ Incompleto</button>
+      <div class="sep"></div>
+      <button class="fbtn fbtn-esp" style="background:#FEF3D7;border-color:var(--oro);color:#8B6200;font-weight:700" onclick="setF('especial','volumen',this)">📊 Mayor volumen</button>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <div class="no-res" id="noRes" style="display:none">No hay trámites con esos filtros.</div>
+  </div>
+
+  <!-- ══ SEMÁFORO ══════════════════════════════════════ -->
+  <div class="panel" id="semaforo">
+    <div class="sec-title">Semáforo de estado — 8 trámites relevados</div>
+    <p style="font-size:12px;color:var(--sec);margin-bottom:22px">Evaluación de cada trámite según completitud del relevamiento, grado de digitalización y criticidad de los problemas detectados.</p>
+
+    <!-- VERDE -->
+    <div style="margin-bottom:26px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:14px;height:14px;border-radius:50%;background:var(--verde-cl)"></div>
+        <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--verde)">🟢 PUBLICAR — Listos para la Guía web (4 trámites)</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px">
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--verde-cl)">
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Certificación de Firma de Intendentes y Viceintendentes para Licencias de Conducir</div>
+          <div style="font-size:10px;color:var(--sec);margin-bottom:8px">Mesa de Entradas · Externo · Inmediato · Gratuito</div>
+          <div style="background:#E8F5E9;border-left:3px solid var(--verde-cl);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#1B4D2E;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--verde);margin-bottom:2px">✓ Listo</strong>Información completa y flujo claro. Oportunidad: publicar checklist para que ciudadanos del interior lleguen con la documentación correcta.</div>
+        </div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--verde-cl)">
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Acceso a Becas, Subsidios y Asistencia Técnica de Organismos Nacionales e Internacionales</div>
+          <div style="font-size:10px;color:var(--sec);margin-bottom:8px">Dir. Relaciones Internacionales · Externo · +2 semanas · Digital</div>
+          <div style="background:#E8F5E9;border-left:3px solid var(--verde-cl);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#1B4D2E;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--verde);margin-bottom:2px">✓ Listo</strong>Disponible cuando se informe convocatoria abierta en la web u otros canales oficiales del Ministerio. El Paso 1 aclara esta condición al ciudadano.</div>
+        </div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--verde-cl)">
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Solicitud de Apoyo Económico para Organizaciones de la Sociedad Civil</div>
+          <div style="font-size:10px;color:var(--sec);margin-bottom:8px">Dir. Relaciones Institucionales · Externo · +2 semanas · Mixto</div>
+          <div style="background:#E8F5E9;border-left:3px solid var(--verde-cl);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#1B4D2E;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--verde);margin-bottom:2px">✓ Listo</strong>Cuenta con formulario digital y plantilla de nota de solicitud. Proceso en vías de digitalización con canales orientados al ciudadano.</div>
+        </div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--verde-cl)">
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Asistencia y Acompañamiento a Instituciones de Bien Público y Entidades Sociales sin Fines de Lucro</div>
+          <div style="font-size:10px;color:var(--sec);margin-bottom:8px">Dir. Relaciones Institucionales · Externo · +2 semanas · Mixto</div>
+          <div style="background:#E8F5E9;border-left:3px solid var(--verde-cl);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#1B4D2E;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--verde);margin-bottom:2px">✓ Listo</strong>Cuenta con plantilla oficial de nota de solicitud disponible en línea para orientar al ciudadano en la presentación.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMARILLO -->
+    <div style="margin-bottom:26px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:14px;height:14px;border-radius:50%;background:var(--naranja)"></div>
+        <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#7B4A00">🟡 REVISAR — Ajuste menor antes de publicar (4 trámites)</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px">
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--naranja)"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Solicitud de Ayuda Social para Personas Físicas</div><div style="font-size:10px;color:var(--sec);margin-bottom:8px">Compras · Externo · Variable · Papel</div><div style="background:#FEF3D7;border-left:3px solid var(--oro);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#5A3E00;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--oro);margin-bottom:2px">⚠ Qué revisar</strong>Sin canal digital ni checklist. Ciudadanos concurren sin saber qué documentación traer, generando visitas infructuosas.</div></div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--naranja)"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Ayuda Social para Instituciones</div><div style="font-size:10px;color:var(--sec);margin-bottom:8px">Compras · Externo · +2 semanas · Mixto</div><div style="background:#FEF3D7;border-left:3px solid var(--oro);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#5A3E00;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--oro);margin-bottom:2px">⚠ Qué revisar</strong>Sin registro de instituciones asistidas ni criterios formales de priorización. Definir criterios antes de publicar.</div></div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--naranja)"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Ayuda Social de Emergencia</div><div style="font-size:10px;color:var(--sec);margin-bottom:8px">Compras · Externo · Inmediato · Papel</div><div style="background:#FEF3D7;border-left:3px solid var(--oro);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#5A3E00;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--oro);margin-bottom:2px">⚠ Qué revisar</strong>Sin protocolo formal de activación. Trámite de mayor impacto ciudadano. Formalizar el circuito urgente antes de publicar.</div></div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--naranja)"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Solicitud de Proyecto, Asesoramiento y Planificación Urbana</div><div style="font-size:10px;color:var(--sec);margin-bottom:8px">Subsec. Plan. Urbana · Externo · 1–2 sem. / +2 sem. · Mixto</div><div style="background:#FEF3D7;border-left:3px solid var(--oro);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#5A3E00;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--oro);margin-bottom:2px">⚠ Qué revisar</strong>Demoras por falta de documentación técnica al inicio. Publicar formulario estructurado vía MuniRed con campos obligatorios.</div></div>
+      </div>
+    </div>
+
+    <!-- ROJO -->
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:14px;height:14px;border-radius:50%;background:var(--rojo)"></div>
+        <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--rojo)">🔴 MEJORAR — Trámites internos con problemas críticos</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:13px">
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--rojo)"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Tramitación de Pago con Factura</div><div style="font-size:10px;color:var(--sec);margin-bottom:8px">Compras · Interno · 1–3 días · +200 exp./mes ⚡ Mayor volumen</div><div style="background:#FDECEC;border-left:3px solid var(--rojo);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#6B1010;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--rojo);margin-bottom:2px">🔴 Problema crítico</strong>Expedientes con documentación incompleta o vencida. Seguimiento manual constante. Sin trazabilidad centralizada. Digitalizar la validación documental tiene el mayor retorno de inversión del ministerio.</div></div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--rojo)"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Concurso de Precios</div><div style="font-size:10px;color:var(--sec);margin-bottom:8px">Compras · Interno · +2 semanas · 10–50/mes</div><div style="background:#FDECEC;border-left:3px solid var(--rojo);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#6B1010;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--rojo);margin-bottom:2px">🔴 Problema crítico</strong>Proceso mixto sin trazabilidad centralizada. Múltiples sistemas en distintas etapas de implementación. Riesgo de error y falta de registro unificado de proveedores.</div></div>
+        <div style="background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:5px solid var(--rojo)"><div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:3px">Solicitud y Rendición de Viáticos</div><div style="font-size:10px;color:var(--sec);margin-bottom:8px">Compras · Interno · Variable · 10–50/mes</div><div style="background:#FDECEC;border-left:3px solid var(--rojo);padding:8px 10px;border-radius:0 5px 5px 0;font-size:11px;color:#6B1010;line-height:1.6"><strong style="display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--rojo);margin-bottom:2px">🔴 Problema crítico</strong>Rendiciones presentadas con demora o comprobantes incompletos. Genera saldos pendientes que dificultan la gestión presupuestaria y el cierre contable.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GUÍA AL CIUDADANO ═════════════════════════════ -->
+  <div class="panel" id="guia">
+    <div class="sec-title">Guía de Trámites — Versión ciudadana (para publicar en la web)</div>
+    <p style="font-size:12px;color:var(--sec);margin-bottom:22px">Solo trámites externos. Contenido listo para transferir al formato de pasos expandibles de la web del Ministerio. Los marcados en 🟡 requieren un ajuste menor antes de publicar.</p>
+
+    <!-- TRÁMITE 1 -->
+    <div style="background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3">Certificación de Firma de Intendentes y Viceintendentes para Renovación de Licencia de Conducir</div>
+        <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#E8F5E9;color:var(--verde);white-space:nowrap;flex-shrink:0">🟢 Listo para publicar</span>
+      </div>
+      <div style="font-size:11px;color:var(--sec);font-weight:500;margin-bottom:10px">Mesa de Entradas y Salidas</div>
+      <div style="font-size:12px;color:var(--sec);line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #EEF0F6">Trámite mediante el cual se certifica la firma de intendentes y viceintendentes de toda la provincia en la documentación requerida para la renovación o actualización de licencias de conducir de personas que se encuentran en el exterior del país.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Quién puede realizarlo y qué necesita?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Puede solicitarlo la persona interesada, un familiar o un tercero mayor de 18 años. Requisitos: fotocopia del DNI del titular, hoja original emitida por el municipio con la firma del intendente o viceintendente, y número de teléfono o correo electrónico de contacto.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo realizar el pago?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Este trámite es gratuito.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Dónde y cuándo se realiza?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Mesa de Entradas del Ministerio de Coordinación y Planificación — 25 de Mayo 1041, Corrientes Capital. Horario de atención: lunes a viernes de 7:30 a 13:00 hs.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo finaliza el trámite?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Una vez ingresada la documentación, Mesa de Entradas remite el expediente a Asesoría Legal para la certificación. Finalizado el proceso, se entrega al solicitante la hoja oficial debidamente certificada.</div></div></div>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #EEF0F6;font-size:11px;color:var(--sec);font-weight:500">✓ Gratuito · ⏱ Inmediato (en el momento) · 📍 25 de Mayo 1041, Corrientes</div>
+    </div>
+
+    <!-- TRÁMITE 2 -->
+    <div style="background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3">Acceso a Becas, Subsidios y Asistencia Técnica de Organismos Nacionales e Internacionales</div>
+        <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#E8F5E9;color:var(--verde);white-space:nowrap;flex-shrink:0">🟢 Listo para publicar</span>
+      </div>
+      <div style="font-size:11px;color:var(--sec);font-weight:500;margin-bottom:10px">Dirección de Relaciones Internacionales</div>
+      <div style="font-size:12px;color:var(--sec);line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #EEF0F6">Trámite mediante el cual personas, organizaciones, organismos públicos y universidades reciben asesoramiento y acompañamiento técnico para postular proyectos a convocatorias de becas, subsidios y programas de asistencia técnica nacionales e internacionales, alineados con los ODS.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Quién puede realizarlo y qué necesita?</div><div style="font-size:12px;color:var(--sec);line-height:1.65"><strong>Este trámite está disponible únicamente cuando se informe que una convocatoria se encuentra abierta, a través de la página web del Ministerio u otros canales oficiales disponibles.</strong> Abierto a personas físicas mayores de 18 años, ONGs con personería jurídica, organismos públicos y universidades. Requisitos según perfil: Personas — DNI, CV, formulario de postulación, nota de aval y proyecto vinculado a los ODS. ONGs — personería jurídica, formulario y nota de aval. Organismos/universidades — nota de aval institucional y proyecto. Si hay financiamiento: presupuesto estimado del proyecto.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo realizar el pago?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Este trámite es gratuito.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Dónde y cuándo se realiza?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Las consultas iniciales se realizan de forma digital por correo electrónico o WhatsApp. También se coordinan reuniones presenciales o virtuales. Horario: lunes a viernes de 7:00 a 13:00 hs. Dirección: 25 de Mayo 1041, Ministerio de Coordinación y Planificación. Contacto: relinterycooperacion@gmail.com · WhatsApp: 3795039061.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo finaliza el trámite?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">La Dirección brinda acompañamiento técnico y apoyo en la preparación de la postulación. Una vez finalizada la asistencia, la persona o institución presenta su proyecto ante el organismo convocante. En casos específicos, la Dirección puede realizar la presentación directamente.</div></div></div>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #EEF0F6;font-size:11px;color:var(--sec);font-weight:500">✓ Gratuito · ⏱ Más de 2 semanas · 📍 25 de Mayo 1041 / Digital</div>
+    </div>
+
+    <!-- TRÁMITE 3 -->
+    <div style="background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3">Solicitud de Ayuda Social para Personas Físicas</div>
+        <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#FEF3E2;color:#7B4A00;white-space:nowrap;flex-shrink:0">🟡 En revisión</span>
+      </div>
+      <div style="font-size:11px;color:var(--sec);font-weight:500;margin-bottom:10px">Área de Compras — Asistencia Social</div>
+      <div style="font-size:12px;color:var(--sec);line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #EEF0F6">Trámite mediante el cual personas en situación de vulnerabilidad pueden solicitar una ayuda económica al Ministerio para afrontar situaciones de necesidad específica.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Quién puede realizarlo y qué necesita?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Personas físicas en situación de vulnerabilidad social o económica. Requisitos: DNI del solicitante, descripción de la situación y necesidad, y documentación de respaldo según el tipo de solicitud (factura médica, presupuesto de reparación, etc.).</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo realizar el pago?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Este trámite es gratuito para el solicitante.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Dónde y cuándo se realiza?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Mesa de Entradas del Ministerio de Coordinación y Planificación — 25 de Mayo 1041, Corrientes Capital. Horario de atención: lunes a viernes de 7:30 a 13:00 hs.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo finaliza el trámite?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Una vez evaluada la solicitud, se notifica al interesado. Si es aprobada, Tesorería efectiviza el pago o la asistencia. El tiempo de respuesta varía según la complejidad de la situación.</div></div></div>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #EEF0F6;font-size:11px;color:var(--sec);font-weight:500">✓ Gratuito · ⏱ Variable según evaluación · 📍 25 de Mayo 1041, Corrientes</div>
+    </div>
+
+    <!-- TRÁMITE 4 -->
+    <div style="background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3">Ayuda Social para Instituciones</div>
+        <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#FEF3E2;color:#7B4A00;white-space:nowrap;flex-shrink:0">🟡 En revisión</span>
+      </div>
+      <div style="font-size:11px;color:var(--sec);font-weight:500;margin-bottom:10px">Área de Compras — Asistencia Social</div>
+      <div style="font-size:12px;color:var(--sec);line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #EEF0F6">Trámite mediante el cual organizaciones de la sociedad civil, asociaciones o instituciones sin fines de lucro pueden solicitar asistencia económica o en especie al Ministerio.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Quién puede realizarlo y qué necesita?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Asociaciones civiles, fundaciones, cooperadoras, clubes u otras instituciones sin fines de lucro con personería jurídica. Requisitos: personería jurídica vigente, nota de solicitud con membrete institucional, descripción del proyecto o necesidad, presupuesto estimado y DNI del representante legal.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo realizar el pago?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Este trámite es gratuito para la institución solicitante.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Dónde y cuándo se realiza?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Mesa de Entradas del Ministerio de Coordinación y Planificación — 25 de Mayo 1041, Corrientes Capital. Horario de atención: lunes a viernes de 7:30 a 13:00 hs.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo finaliza el trámite?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Una vez evaluada la pertinencia de la solicitud, se emite el acto administrativo de aprobación. Tesorería efectiviza la transferencia o entrega de la asistencia en el plazo establecido.</div></div></div>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #EEF0F6;font-size:11px;color:var(--sec);font-weight:500">✓ Gratuito · ⏱ Más de 2 semanas · 📍 25 de Mayo 1041, Corrientes</div>
+    </div>
+
+    <!-- TRÁMITE 5 -->
+    <div style="background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3">Ayuda Social de Emergencia</div>
+        <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#FEF3E2;color:#7B4A00;white-space:nowrap;flex-shrink:0">🟡 En revisión</span>
+      </div>
+      <div style="font-size:11px;color:var(--sec);font-weight:500;margin-bottom:10px">Área de Compras — Asistencia Social</div>
+      <div style="font-size:12px;color:var(--sec);line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #EEF0F6">Trámite urgente para personas o familias que atraviesan una situación de emergencia social (incendio, inundación, pérdida súbita de vivienda) y requieren asistencia inmediata del Estado provincial.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Quién puede realizarlo y qué necesita?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Personas o familias que atraviesan una situación de emergencia social comprobable. Requisitos: DNI del solicitante, acta policial, acta de Defensa Civil o documentación que acredite la emergencia, y número de contacto. En situaciones de extrema urgencia, la documentación puede completarse con posterioridad.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo realizar el pago?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Este trámite es gratuito.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Dónde y cuándo se realiza?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Mesa de Entradas del Ministerio de Coordinación y Planificación — 25 de Mayo 1041, Corrientes Capital. Horario: lunes a viernes de 7:30 a 13:00 hs. En casos de emergencia fuera del horario habitual, comunicarse al número de guardia del Ministerio.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo finaliza el trámite?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Verificada la situación de emergencia, se autoriza la asistencia de forma simplificada y se efectiviza la ayuda (dinero, elementos esenciales u otro tipo de asistencia) de forma inmediata o dentro de las 24 horas hábiles.</div></div></div>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #EEF0F6;font-size:11px;color:var(--sec);font-weight:500">✓ Gratuito · ⏱ Inmediato / hasta 24 hs · 📍 25 de Mayo 1041, Corrientes</div>
+    </div>
+
+    <!-- TRÁMITE: ASISTENCIA INSTITUCIONAL -->
+    <div style="background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3">Solicitud de Apoyo Económico para Organizaciones de la Sociedad Civil</div>
+        <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#E8F5E9;color:var(--verde);white-space:nowrap;flex-shrink:0">🟢 Listo para publicar</span>
+      </div>
+      <div style="font-size:11px;color:var(--sec);font-weight:500;margin-bottom:10px">Dirección de Relaciones Institucionales y con la Sociedad Civil</div>
+      <div style="font-size:12px;color:var(--sec);line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #EEF0F6">Trámite mediante el cual organizaciones de la sociedad civil, municipios u organismos pueden solicitar asistencia institucional al Ministerio. Cuenta con formulario digital y plantilla de nota para orientar al ciudadano.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Quién puede realizarlo y qué necesita?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Organizaciones de la sociedad civil, municipios, organismos públicos e instituciones. Requisitos: completar el <a href="https://forms.gle/XXoh6w3TfAqpmyxEA" target="_blank" style="color:var(--azul-med)">formulario de asistencia institucional</a> y presentar nota firmada usando la <a href="https://acortar.link/OZajQ1" target="_blank" style="color:var(--azul-med)">plantilla oficial</a>. Sin costo.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo realizar el pago?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Este trámite es gratuito.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Dónde y cuándo se realiza?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">El formulario se completa en línea. La nota firmada se presenta en Mesa de Entradas del Ministerio — 25 de Mayo 1041, Corrientes Capital. Horario: lunes a viernes de 7:30 a 13:00 hs.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo finaliza el trámite?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">La Dirección evalúa la solicitud, contacta al referente y coordina la asistencia institucional acordada. Se emite la documentación correspondiente al finalizar.</div></div></div>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #EEF0F6;font-size:11px;color:var(--sec);font-weight:500">✓ Gratuito · ⏱ Más de 2 semanas · 📍 25 de Mayo 1041 / Digital · 📋 <a href="https://forms.gle/XXoh6w3TfAqpmyxEA" target="_blank" style="color:var(--azul-med)">Formulario</a> · 📄 <a href="https://acortar.link/OZajQ1" target="_blank" style="color:var(--azul-med)">Plantilla de nota</a></div>
+    </div>
+
+    <!-- TRÁMITE: NOTA AL MINISTERIO -->
+    <div style="background:#fff;border-radius:10px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">
+        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3">Asistencia y Acompañamiento a Instituciones de Bien Público y Entidades Sociales sin Fines de Lucro</div>
+        <span style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#E8F5E9;color:var(--verde);white-space:nowrap;flex-shrink:0">🟢 Listo para publicar</span>
+      </div>
+      <div style="font-size:11px;color:var(--sec);font-weight:500;margin-bottom:10px">Dirección de Relaciones Institucionales y con la Sociedad Civil</div>
+      <div style="font-size:12px;color:var(--sec);line-height:1.7;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #EEF0F6">Trámite para presentar una nota formal usando la plantilla oficial disponible en línea. Reduce errores de presentación y agiliza el circuito administrativo.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Quién puede realizarlo y qué necesita?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Cualquier ciudadano, municipio, organismo o institución. Requisitos: nota completada con la <a href="https://acortar.link/OZajQ1" target="_blank" style="color:var(--azul-med)">plantilla oficial</a>, firmada por el presentante o autoridad competente. Presentar original y copia. Sin costo.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo realizar el pago?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Este trámite es gratuito.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Dónde y cuándo se realiza?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">Mesa de Entradas del Ministerio de Coordinación y Planificación — 25 de Mayo 1041, Corrientes Capital. Horario: lunes a viernes de 7:30 a 13:00 hs. Mesa de Entradas sella la copia como constancia de ingreso.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;border-radius:50%;background:var(--azul);color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div><div><div style="font-size:11px;font-weight:600;color:var(--azul);margin-bottom:3px">¿Cómo finaliza el trámite?</div><div style="font-size:12px;color:var(--sec);line-height:1.65">La nota es derivada al área competente para su resolución. El presentante es notificado según el plazo de resolución del área interviniente.</div></div></div>
+      </div>
+      <div style="padding-top:12px;border-top:1px solid #EEF0F6;font-size:11px;color:var(--sec);font-weight:500">✓ Gratuito · ⏱ Más de 2 semanas · 📍 25 de Mayo 1041, Corrientes · 📄 <a href="https://acortar.link/OZajQ1" target="_blank" style="color:var(--azul-med)">Descargar plantilla de nota</a></div>
+    </div>
+
+  </div>
+
+  <div class="panel" id="recomendaciones">
+    <div class="sec-title">Recomendaciones estratégicas — Presentación al Instituto de Modernización</div>
+
+    <!-- BLOQUE 1: INMEDIATAS -->
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--rojo);flex-shrink:0"></div>
+        <span style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--rojo);text-transform:uppercase;letter-spacing:1px">Acciones inmediatas — Mayor impacto, menor esfuerzo</span>
+      </div>
+      <div class="rec-grid">
+        <div class="rec">
+          <div class="rec-urg">Impacto rápido</div>
+          <div class="rec-icon">🌐</div>
+          <div class="rec-titulo">Publicar los 4 trámites externos listos</div>
+          <div class="rec-texto">4 trámites están en estado 🟢 y listos para publicar: Certificación de Firmas, Becas Internacionales (cuando haya convocatoria activa), Solicitud de Apoyo Económico para OSC y Asistencia a Instituciones de Bien Público. Los 4 en revisión (Ayudas Sociales + Plan. Urbana) necesitan ajustes menores antes de publicar.</div>
+        </div>
+        <div class="rec">
+          <div class="rec-urg">Impacto rápido</div>
+          <div class="rec-icon">📋</div>
+          <div class="rec-titulo">Checklist de requisitos descargable</div>
+          <div class="rec-texto">El problema transversal más frecuente en todos los relevamientos: ciudadanos y áreas se presentan sin la documentación completa. Un checklist descargable junto a cada ficha web resuelve esto sin digitalizar el proceso completo. Aplica a certificación de firmas, ayudas sociales y planificación urbana.</div>
+        </div>
+        <div class="rec">
+          <div class="rec-icon">🚨</div>
+          <div class="rec-titulo">Formalizar protocolo de emergencia social</div>
+          <div class="rec-texto">La Ayuda Social de Emergencia es el trámite de mayor impacto ciudadano y el único sin protocolo formal. Las respuestas actuales son desiguales según quién lo gestione. Diseñar un circuito de activación urgente en 30 días, antes de publicar la ficha en la web, para garantizar consistencia en toda la provincia.</div>
+        </div>
+        <div class="rec">
+          <div class="rec-icon">📡</div>
+          <div class="rec-titulo">Activar canal digital institucional en RR. Internacionales</div>
+          <div class="rec-texto">El área ya opera totalmente en digital pero por canales informales (Gmail personal, WhatsApp). Activar la presencia web institucional con una dirección de correo oficial y respuesta automática ampliaría el alcance a toda la provincia y profesionalizaría el servicio de acompañamiento a becas y subsidios.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOQUE 2: MEJORA DE PROCESOS INTERNOS -->
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--naranja);flex-shrink:0"></div>
+        <span style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--naranja);text-transform:uppercase;letter-spacing:1px">Mejora de procesos internos — Mayor retorno de inversión</span>
+      </div>
+      <div class="rec-grid">
+        <div class="rec">
+          <div class="rec-icon">🔴</div>
+          <div class="rec-titulo">Digitalizar el circuito de Compras (+200 exp./mes)</div>
+          <div class="rec-texto">Con más de 200 expedientes de pago por mes, el circuito de Compras es el de mayor volumen del Ministerio y el de mayor costo operativo por errores documentales. Implementar un checklist digital de validación en el ingreso del expediente reduce rechazos, seguimiento manual y demoras. Mayor retorno de inversión del Ministerio.</div>
+        </div>
+        <div class="rec">
+          <div class="rec-icon">👥</div>
+          <div class="rec-titulo">Unificar los registros de RRHH en un sistema único</div>
+          <div class="rec-texto">Los 3 trámites de RRHH relevados (altas, bajas, novedades) tienen el mismo problema estructural: carga paralela en SISPER y planillas Excel independientes, generando duplicación de datos y riesgo de inconsistencias. Migrar a un flujo único en SISPER elimina la duplicación y reduce el tiempo de registro de novedades (50–200/mes) de días a horas.</div>
+        </div>
+        <div class="rec">
+          <div class="rec-icon">🏗️</div>
+          <div class="rec-titulo">Estandarizar el ingreso de solicitudes en Plan. Urbana</div>
+          <div class="rec-texto">Las demoras en el trámite de Proyectos Urbanos se originan en la falta de documentación técnica base al inicio (planos, croquis, antecedentes catastrales). Publicar un formulario de solicitud estructurado vía MuniRed con campos obligatorios evita el vaivén de documentación y reduce el tiempo de primera respuesta de semanas a días.</div>
+        </div>
+        <div class="rec">
+          <div class="rec-icon">📊</div>
+          <div class="rec-titulo">Implementar OKR del trimestre</div>
+          <div class="rec-texto">Con 12 trámites relevados, el Programa ya tiene base suficiente para comprometer resultados medibles. OKR propuesto: (1) publicar 100% de trámites externos en 2 semanas, (2) reducir tiempo promedio de resolución de los 3 trámites de mayor volumen en un 30% al cierre del trimestre, (3) entregar propuesta de digitalización de Compras antes del día 45.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOQUE 3: ESCALAMIENTO -->
+    <div style="margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--azul-cl);flex-shrink:0"></div>
+        <span style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul-cl);text-transform:uppercase;letter-spacing:1px">Escalamiento provincial — Presentación al Instituto de Modernización</span>
+      </div>
+      <div class="rec-grid">
+        <div class="rec">
+          <div class="rec-icon">🏛️</div>
+          <div class="rec-titulo">Replicar la metodología en toda la provincia</div>
+          <div class="rec-texto">El formulario de relevamiento ya está probado y adaptado para el MCyP y el Ministerio de Desarrollo Social. El proceso completo (semana 1: diseño, semana 2: relevamiento, semana 3: consolidación, semana 4: publicación) puede replicarse en cualquier ministerio provincial. Presentar al IME como modelo escalable estándar para Corrientes.</div>
+        </div>
+        <div class="rec">
+          <div class="rec-icon">🔗</div>
+          <div class="rec-titulo">Articular con el Mapa de Estado (organigrama web)</div>
+          <div class="rec-texto">El Ministerio ya tiene una herramienta desarrollada (Mapa de Estado en Laravel/VueJS) que muestra el organigrama, autoridades y normativa. La Guía de Trámites es el complemento natural: mientras el Mapa de Estado dice qué hace cada área, la Guía dice cómo el ciudadano puede interactuar. Integrar ambas maximiza el valor de lo ya desarrollado.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRÓXIMOS PASOS -->
+    <div class="sec-title">Próximos pasos — Plan de acción semanal</div>
+
+    <!-- SEMANA ACTUAL -->
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sec);margin-bottom:10px">Semana actual — Completar el relevamiento</div>
+      <div style="background:#fff;border-radius:10px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-left:4px solid var(--oro)">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:5px">📂 Cerrar áreas pendientes</div>
+            <div style="font-size:11px;color:var(--sec);line-height:1.6">Completar los formularios de Subsecretaría de Modernización del Estado y Asesoría Legal para cerrar el relevamiento del MCyP con el 100% de las áreas.</div>
+          </div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:5px">✏️ Ajustar los 4 trámites en revisión</div>
+            <div style="font-size:11px;color:var(--sec);line-height:1.6">Simplificar los requisitos de Becas Internacionales (filtro por perfil), definir criterios de ayudas sociales y redactar el protocolo de emergencia para que los 🟡 pasen a 🟢.</div>
+          </div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:5px">📊 Validar datos de volumen con cada área</div>
+            <div style="font-size:11px;color:var(--sec);line-height:1.6">Confirmar los volúmenes mensuales declarados en los formularios con los referentes, especialmente en Compras y RRHH, para tener datos precisos para el informe al IME.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-grid">
+      <div class="next" data-n="1">
+        <div class="nx-num">Semana 1 · Próxima semana</div>
+        <div class="nx-tit">Mejora de trámites externos a publicar</div>
+        <div class="nx-txt">Ajustar los 4 trámites en revisión 🟡: simplificar requisitos de becas, formalizar protocolo de emergencia, definir criterios de ayudas sociales. Diseñar y publicar checklist de requisitos para cada ficha. Resultado: todos los externos pasan a 🟢.</div>
+      </div>
+      <div class="next" data-n="2">
+        <div class="nx-num">Semana 2 · Guía de trámites publicada</div>
+        <div class="nx-tit">Guía de Trámites publicada en la web</div>
+        <div class="nx-txt">Publicar los 6 trámites externos en la web del Ministerio con el formato de 4 pasos expandibles. Articular con el Mapa de Estado (organigrama web existente). Comunicar la publicación internamente y al IME como hito concreto del Programa.</div>
+      </div>
+      <div class="next" data-n="3">
+        <div class="nx-num">Semana 3 · Procesos internos</div>
+        <div class="nx-tit">Propuesta de mejora de procesos internos</div>
+        <div class="nx-txt">Entregar informe ejecutivo con: diagnóstico de los 6 trámites internos 🔴, plan de digitalización del circuito de Compras (+200 exp./mes), propuesta de unificación de registros RRHH en SISPER, y hoja de ruta priorizada por impacto/esfuerzo.</div>
+      </div>
+      <div class="next" data-n="4">
+        <div class="nx-num">Semana 4 · Instituto de Modernización</div>
+        <div class="nx-tit">Presentación ante el IME + OKR</div>
+        <div class="nx-txt">Presentación ejecutiva: metodología replicable · 12 trámites relevados · Guía publicada · semáforo de estado · propuesta de mejora de procesos · OKR del trimestre · modelo para escalar a toda la provincia.</div>
+      </div>
+    </div>
+
+    <!-- RESUMEN VISUAL DE OKR -->
+    <div style="margin-top:28px">
+      <div class="sec-title">OKR del trimestre — Compromisos medibles</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+        <div style="background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-top:4px solid var(--azul-cl)">
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--azul-cl);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Objetivo principal</div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--azul);line-height:1.3;margin-bottom:12px">Modernizar la experiencia del ciudadano y optimizar los procesos internos del Ministerio</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:var(--bg);border-radius:6px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:700;color:var(--azul-cl);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">KR1</div>
+              <div style="font-size:11px;color:var(--texto);font-weight:500">Publicar el 100% de los trámites externos en la web del Ministerio antes del día 14</div>
+            </div>
+            <div style="background:var(--bg);border-radius:6px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:700;color:var(--azul-cl);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">KR2</div>
+              <div style="font-size:11px;color:var(--texto);font-weight:500">Reducir el tiempo promedio de resolución de los 3 trámites de mayor volumen en un 30% al cierre del trimestre</div>
+            </div>
+            <div style="background:var(--bg);border-radius:6px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:700;color:var(--azul-cl);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">KR3</div>
+              <div style="font-size:11px;color:var(--texto);font-weight:500">Entregar propuesta de digitalización del circuito de Compras y RRHH antes del día 21</div>
+            </div>
+            <div style="background:var(--bg);border-radius:6px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:700;color:var(--azul-cl);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">KR4</div>
+              <div style="font-size:11px;color:var(--texto);font-weight:500">Presentar metodología replicable ante el IME con al menos 2 ministerios provinciales comprometidos para adoptar el modelo</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--azul);border-radius:10px;padding:18px;color:#fff">
+          <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--oro-lt);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Estado actual del semáforo</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:12px;height:12px;border-radius:50%;background:var(--verde-cl);flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:600;color:#fff">🟢 Listo para publicar</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.6)">Certificación Firmas · Becas Internacionales · Apoyo Económico OSC · Asistencia Inst. Bien Público</div>
+              </div>
+              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde-cl)">4</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:12px;height:12px;border-radius:50%;background:var(--naranja);flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:600;color:#fff">🟡 En revisión</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.6)">4 externos · Ayudas Sociales (3) + Plan. Urbana (1)</div>
+              </div>
+              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--naranja)">4</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:12px;height:12px;border-radius:50%;background:var(--rojo);flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:600;color:#fff">🔴 Mejora de proceso</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.6)">9 internos · Compras 3 · Admin 1 · Mesa Ent. 2 · RRHH 3</div>
+              </div>
+              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--rojo)">9</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:12px;height:12px;border-radius:50%;background:#9CA3AF;flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:600;color:#fff">⚫ Incompleto</div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.6)">4 trámites · Caratulación SIIF · Publicidad Admin · GIRSU (2)</div>
+              </div>
+              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#9CA3AF">4</div>
+            </div>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px">
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Trámite crítico nro. 1</div>
+            <div style="font-size:12px;font-weight:600;color:#fff">Pago con Factura — Compras</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.6)">+200 expedientes/mes · mayor volumen del Ministerio · digitalización urgente</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const T = [
+  // ── MESA DE ENTRADAS ─────────────────────────────────
+  {id:8,area:'mesa',an:'División Mesa de Entradas y Salidas',resp:'Miryam Viviana Conyl',tipo:'externo',sem:'v',vn:5,
+   nombre:'Certificación de Firma de Intendentes y Viceintendentes para Licencias de Conducir',
+   desc:'Trámite para certificar la firma de intendentes o viceintendentes en documentación necesaria para gestiones vinculadas a la licencia de conducir de personas que se encuentran en el exterior del país. En esta oficina únicamente se realiza la certificación de la firma; no se tramita la licencia de conducir.',
+   tiempo:'Inmediato (en el momento)',vol:'Menos de 10/mes',modal:'Totalmente en papel',sis:'Ninguno',
+   quien:'La persona interesada, un familiar o un tercero mayor de 18 años.',
+   req:'Fotocopia del DNI del titular · Hoja original emitida por el municipio con la firma del intendente o viceintendente (debe presentarse ya firmada) · Número de teléfono y/o correo electrónico de contacto. La documentación debe presentarse ya firmada por el intendente o viceintendente. En esta oficina solo se certifica la firma. Gratuito.',
+   pasos:['El ciudadano presenta la documentación en Mesa de Entradas del Ministerio.','Mesa de Entradas verifica que la documentación esté completa y ya firmada por el intendente o viceintendente.','El expediente se remite a Asesoría Legal para la certificación de la firma.','Se entrega al solicitante la hoja oficial debidamente certificada.'],
+   prob:'Ciudadanos concurren frecuentemente sin la firma del intendente, especialmente del interior. No existen canales virtuales de consulta previa.',
+   kpis:[{n:'% solicitantes con documentación completa al primer intento',d:'Sin medición. Problema frecuente.',m:'Meta: >85% en 60 días con checklist en web.'},{n:'Tiempo de resolución',d:'Inmediato cuando hay documentación completa.',m:'Mantener en inmediato. Medir excepciones.'}]},
+
+  {id:13,area:'mesa',an:'División Mesa de Entradas y Salidas',resp:'Miryam Viviana Conyl',tipo:'interno',sem:'r',vn:5,
+   nombre:'Recepción de Nota dirigida al Ministro o Autoridad Superior',
+   desc:'Trámite mediante el cual cualquier ciudadano, municipio, organismo público o institución puede presentar una nota formal ante el Ministerio de Coordinación y Planificación dirigida al Ministro o a una autoridad superior.',
+   tiempo:'Más de 2 semanas (resolución)',vol:'Menos de 10/mes',modal:'Totalmente en papel',sis:'Ninguno (registro en cuaderno físico)',
+   quien:'Cualquier ciudadano, municipio, organismo público o institución.',
+   req:'Nota firmada por el presentante o autoridad competente (original y copia — la copia es sellada como constancia de ingreso) · Datos de contacto para la respuesta. Sin costo.',
+   pasos:['El ciudadano u organismo presenta la nota original con copia en Mesa de Entradas.','Mesa de Entradas sella la copia como constancia de ingreso y la devuelve al presentante.','La nota es registrada y derivada al Despacho del Ministro.','El Ministro la canaliza al área que resolverá o responderá.','El presentante es notificado por el área interviniente según el plazo de resolución correspondiente.'],
+   prob:'Registro solo en cuaderno físico. Sin trazabilidad digital. Sin plazo de respuesta definido. Sin notificación al presentante sobre el estado de su nota.',
+   kpis:[{n:'Tiempo promedio de respuesta al presentante',d:'Sin medición. Sin plazo formal definido.',m:'Meta: definir plazo máximo de respuesta y notificar digitalmente.'},{n:'% de notas con trazabilidad digital',d:'0% actualmente.',m:'Meta: 100% registradas en SIIF en 60 días.'}]},
+
+  {id:14,area:'mesa',an:'División Mesa de Entradas y Salidas',resp:'Miryam Viviana Conyl',tipo:'interno',sem:'r',vn:250,
+   nombre:'Ingreso y Control de Expedientes (Internos y Externos)',
+   desc:'Proceso mediante el cual la Mesa de Entradas recibe expedientes físicos, verifica su integridad documental y registra su ingreso para su posterior caratulación y derivación a las áreas correspondientes del Ministerio.',
+   tiempo:'Inmediato (en el momento)',vol:'Más de 200/mes',modal:'Mixto (papel + digital)',sis:'SIIF / Excel',
+   quien:'Las áreas internas del Ministerio, la Secretaría Privada, municipios y otros organismos que deban presentar expedientes o documentación administrativa.',
+   req:'Expediente físico completo · Documentación respaldatoria correspondiente · Firmas y sellos requeridos · Nota o solicitud que motive el inicio del expediente.',
+   pasos:['El área u organismo presenta el expediente físico completo en Mesa de Entradas.','Mesa de Entradas verifica la integridad documental (firmas, sellos, documentación respaldatoria).','El expediente es registrado en SIIF y en planilla Excel.','Se caratula el expediente y se le asigna número de registro.','Se deriva al área competente para continuar su tramitación.'],
+   prob:'Desconexión físico-digital: expedientes en papel sin registro inmediato en sistema. Pases manuales "en mano" sin trazabilidad. Triple registro (cuaderno físico, Excel y SIIF) — trabajo duplicado con riesgo de inconsistencias.',
+   kpis:[{n:'% expedientes registrados en SIIF el mismo día de ingreso',d:'Sin medición. Problema sistémico.',m:'Meta: 100% mismo día con digitalización del circuito.'},{n:'Inconsistencias entre cuaderno, Excel y SIIF',d:'Sin medición.',m:'Meta: eliminar registro en cuaderno físico en 30 días.'}]},
+
+  {id:15,area:'mesa',an:'División Mesa de Entradas y Salidas',resp:'Miryam Viviana Conyl',tipo:'interno',sem:'i',vn:0,
+   nombre:'Caratulación / Creación en SIIF',
+   desc:'Proceso de creación formal del expediente en el sistema SIIF y asignación de carátula para su ingreso al circuito administrativo del Ministerio.',
+   tiempo:'Inmediato (en el momento)',vol:'Pendiente de completar',modal:'Pendiente de completar',sis:'SIIF',
+   quien:'Pendiente de completar — formulario con datos copiados del trámite de Certificación de Firma.',
+   req:'Pendiente de completar.',
+   pasos:['Pendiente de completar — el formulario entregado tiene datos de otro trámite copiados por error.'],
+   prob:'Formulario incompleto: los datos del Paso 1 (DNI del titular, firma de intendente) corresponden al trámite de Certificación de Firma, no a este proceso. Requiere nueva entrega por parte del referente.',
+   kpis:[{n:'Completar relevamiento',d:'Formulario incompleto.',m:'Pendiente de nueva entrega por el referente del área.'}]},
+
+  // ── COMPRAS / ADMIN ──────────────────────────────────
+  {id:1,area:'compras',an:'Dpto. de Compras',resp:'Daniel Laredo',tipo:'interno',sem:'r',vn:250,
+   nombre:'Tramitación de Pago de Bienes y Servicios con Factura',
+   desc:'Trámite administrativo mediante el cual las distintas áreas del Ministerio gestionan el pago de bienes o servicios ya adquiridos, presentando la factura correspondiente. La Dirección de Administración, a través del Departamento de Compras, verifica la documentación fiscal, confecciona la orden y el acta administrativa, y remite el expediente para su autorización y posterior pago.',
+   tiempo:'1–3 días hábiles',vol:'Más de 200/mes',modal:'Mixto (papel + digital)',sis:'Drive compartido / SIIF / ARCA / DoCo (en implementación)',
+   quien:'Las áreas, direcciones o subsecretarías del Ministerio que requieran gestionar el pago de bienes o servicios.',
+   req:'Nota de solicitud firmada por el responsable del área · Factura válida emitida por el proveedor · Certificado Fiscal para Contratar vigente · Inscripción vigente en Rentas · Verificación del CAE ante AFIP · Sellado de ley correspondiente · Documentación complementaria según el tipo de gasto.',
+   pasos:['El área presenta nota firmada + factura y documentación fiscal ante la Dirección de Administración.','Compras verifica la validez de la documentación (CAE, certificados, sellados, firmas).','Se confecciona la orden de compra y el acta administrativa.','El expediente se autoriza mediante Disposición o Resolución y se registra el compromiso presupuestario.','El expediente continúa a Tesorería para efectuar el pago al proveedor.'],
+   prob:'Muchos expedientes ingresan con documentación incompleta o vencida (facturas, certificados fiscales, sellados o firmas faltantes), lo que obliga al área a realizar un seguimiento manual constante y genera demoras en el circuito.',
+   kpis:[{n:'% expedientes rechazados por documentación incompleta',d:'Sin medición actualmente.',m:'Meta: <10% en 90 días con checklist digital.'},{n:'Tiempo promedio ingreso → pago efectivo',d:'Sin medición formal.',m:'Meta: 3 días hábiles con flujo digitalizado.'},{n:'Digitalización del circuito',d:'Mixto. DoCo en implementación.',m:'Meta: 100% digital en 6 meses.'}]},
+
+  {id:2,area:'compras',an:'Dpto. de Compras',resp:'Daniel Laredo',tipo:'interno',sem:'r',vn:30,
+   nombre:'Concurso de Precios para Adquisición de Bienes y Servicios',
+   desc:'Procedimiento administrativo para seleccionar proveedores cuando el monto estimado de la contratación supera el límite establecido para compra directa ($3.100.000), requiriendo la comparación de al menos tres presupuestos y la emisión de una Resolución ministerial de adjudicación.',
+   tiempo:'1 a 2 semanas',vol:'10–50/mes',modal:'Mixto (papel + digital)',sis:'Drive compartido / SIIF / DoCo (en implementación)',
+   quien:'Las áreas del Ministerio que necesiten contratar bienes o servicios cuyo monto supere los $3.100.000.',
+   req:'Nota de solicitud fundada · Especificaciones técnicas del bien o servicio · Presupuestos de al menos tres proveedores del ramo · Cuadro comparativo elaborado por Compras · Informe técnico de evaluación · Certificados fiscales y documentación del proveedor adjudicado · Factura definitiva y sellados correspondientes.',
+   pasos:['El área requirente eleva la necesidad con especificaciones técnicas al Departamento de Compras.','Compras solicita al menos 3 presupuestos a proveedores del ramo.','Se evalúan las ofertas, se confecciona el cuadro comparativo y el informe técnico.','El Ministro aprueba la adjudicación mediante Resolución.','Se incorpora la factura del proveedor, se registra el compromiso presupuestario y el expediente pasa a Tesorería para el pago.'],
+   prob:'El proceso involucra múltiples áreas y aprobaciones sucesivas (Compras, Contabilidad, Asesoría Legal y Ministro), lo que incrementa significativamente los tiempos de gestión y dificulta la trazabilidad del expediente.',
+   kpis:[{n:'Tiempo promedio del proceso completo',d:'Sin medición. Múltiples aprobaciones generan demoras.',m:'Meta: 10 días hábiles con flujo digital.'},{n:'Proveedores activos en el registro',d:'Sin dato disponible.',m:'Meta: padrón actualizado con verificación trimestral.'}]},
+
+  {id:3,area:'compras',an:'Dpto. de Compras',resp:'Daniel Laredo',tipo:'interno',sem:'r',vn:30,
+   nombre:'Solicitud y Rendición de Viáticos y Gastos de Movilidad',
+   desc:'Trámite administrativo mediante el cual se autoriza el otorgamiento de anticipos para comisiones de servicio y posteriormente se rinden los gastos efectuados por los agentes públicos.',
+   tiempo:'Solicitud: 1–3 días / Rendición: hasta 10 días hábiles post-regreso',vol:'10–50/mes',modal:'Mixto (papel + digital)',sis:'SIIF / planilla Excel',
+   quien:'Agentes del Ministerio que realicen comisiones de servicio dentro o fuera de la provincia.',
+   req:'Solicitud de viático firmada por el superior · Autorización de comisión · Al regreso: comprobantes de gastos (facturas, tickets, peajes) · Planilla de rendición firmada.',
+   pasos:['El agente presenta la solicitud con la autorización de comisión.','Compras verifica y confecciona el anticipo.','Se aprueba mediante acto administrativo y liquida Tesorería.','Finalizada la comisión, el agente presenta la rendición con comprobantes.','Compras controla la rendición y regulariza el saldo.'],
+   prob:'Rendiciones presentadas con demora o comprobantes incompletos. Genera saldos pendientes que dificultan la gestión presupuestaria y el cierre contable.',
+   kpis:[{n:'% de rendiciones presentadas en término',d:'Sin medición.',m:'Meta: 90% en plazo en 60 días.'},{n:'Días promedio de demora en rendición',d:'Sin dato.',m:'Meta: cumplimiento del plazo reglamentario.'}]},
+
+  {id:4,area:'compras',an:'Dpto. de Compras / Dir. Administración',resp:'Daniel Laredo',tipo:'externo',sem:'a',vn:30,
+   nombre:'Solicitud de Ayuda Social para Personas Físicas',
+   desc:'Trámite mediante el cual personas en situación de necesidad pueden solicitar asistencia económica o material ante el Ministerio de Coordinación y Planificación. El pedido se presenta mediante nota dirigida al Ministro y, una vez verificados los requisitos, se constituye el expediente para su evaluación y eventual aprobación.',
+   tiempo:'Variable según evaluación',vol:'10–50/mes',modal:'Papel',sis:'Ninguno',
+   quien:'Personas físicas en situación de vulnerabilidad social o económica.',
+   req:'Nota dirigida al Ministro firmada por el solicitante · DNI del solicitante · Descripción de la situación y necesidad · Documentación de respaldo según el tipo de solicitud (factura médica, presupuesto, etc.).',
+   pasos:['El ciudadano presenta nota dirigida al Ministro con documentación en Mesa de Entradas.','Mesa de Entradas ingresa la nota y la deriva al Despacho del Ministro.','El Ministro canaliza al área evaluadora correspondiente.','Se evalúa la situación y se determina el monto y tipo de asistencia.','Se emite el acto administrativo de aprobación. Tesorería efectiviza el pago o la asistencia.'],
+   prob:'Sin canal digital para iniciar la solicitud. Ciudadanos concurren sin saber qué documentación traer, generando visitas infructuosas. Sin plazo de respuesta definido.',
+   kpis:[{n:'Tiempo desde solicitud hasta resolución',d:'Sin medición.',m:'Meta: respuesta en 5 días hábiles.'},{n:'Solicitudes resueltas vs. recibidas',d:'Sin dato.',m:'Meta: publicar tasa de aprobación.'}]},
+
+  {id:5,area:'compras',an:'Dpto. de Compras / Dir. Administración',resp:'Daniel Laredo',tipo:'externo',sem:'a',vn:5,
+   nombre:'Ayuda Social para Instituciones',
+   desc:'Trámite mediante el cual organizaciones de la sociedad civil, asociaciones o instituciones sin fines de lucro pueden solicitar asistencia económica o en especie al Ministerio.',
+   tiempo:'Más de 2 semanas',vol:'Menos de 10/mes',modal:'Mixto',sis:'Ninguno',
+   quien:'Asociaciones civiles, fundaciones, cooperadoras, clubes u otras instituciones sin fines de lucro con personería jurídica.',
+   req:'Personería jurídica vigente · Nota dirigida al Ministro con membrete institucional · Descripción del proyecto o necesidad · Presupuesto estimado · DNI del representante legal.',
+   pasos:['La institución presenta nota con documentación en Mesa de Entradas.','Mesa de Entradas ingresa la nota y la deriva al Despacho del Ministro.','El Ministro canaliza al área evaluadora para análisis de pertinencia.','Se evalúa la institución y la necesidad planteada.','Se emite el acto administrativo de aprobación. Tesorería efectiviza la transferencia.'],
+   prob:'Sin registro de instituciones asistidas ni criterios formales de priorización. Sin seguimiento de aplicación de fondos.',
+   kpis:[{n:'Registro de instituciones beneficiarias',d:'No existe.',m:'Meta: implementar padrón en 30 días.'},{n:'Tiempo promedio de resolución',d:'Sin medición.',m:'Meta: 10 días hábiles.'}]},
+
+  {id:6,area:'compras',an:'Dpto. de Compras / Dir. Administración',resp:'Daniel Laredo',tipo:'externo',sem:'a',vn:5,
+   nombre:'Ayuda Social de Emergencia',
+   desc:'Trámite urgente para personas o familias que atraviesan una situación de emergencia social y requieren asistencia inmediata. Se presenta mediante nota de emergencia dirigida al Ministro.',
+   tiempo:'Inmediato / 1–3 días hábiles',vol:'Menos de 10/mes',modal:'Papel (urgente)',sis:'Ninguno',
+   quien:'Personas o familias que atraviesan una situación de emergencia social comprobable.',
+   req:'Nota de emergencia dirigida al Ministro · DNI del solicitante · Acta policial, acta de Defensa Civil o documentación que acredite la emergencia · Número de contacto.',
+   pasos:['El ciudadano o un organismo presenta nota de emergencia en Mesa de Entradas.','Mesa de Entradas canaliza inmediatamente al Despacho del Ministro.','Se evalúa la situación con la documentación disponible de forma simplificada.','Se autoriza la asistencia urgente.','Se efectiviza la ayuda (dinero, elementos esenciales u otro tipo de asistencia).'],
+   prob:'Sin protocolo formal de activación. Respuestas desiguales según quién gestione. Sin registro sistematizado de emergencias atendidas.',
+   kpis:[{n:'Tiempo de respuesta desde la solicitud',d:'Sin medición.',m:'Meta: asistencia en <24 hs.'},{n:'Protocolo de emergencia formalizado',d:'No existe.',m:'Meta: protocolo aprobado en 30 días.'}]},
+
+  {id:16,area:'admin',an:'Dirección de Administración',resp:'Facundo Acevedo',tipo:'interno',sem:'r',vn:10,
+   nombre:'Rendición de Caja Chica',
+   desc:'Trámite administrativo mediante el cual el responsable del fondo de caja chica de cada área rinde los gastos realizados con comprobantes originales, para su aprobación por Contaduría y posterior reposición del fondo por Tesorería.',
+   tiempo:'1 a 2 semanas',vol:'Menos de 10 / área / mes',modal:'Mixto (papel + digital)',sis:'Excel / DoCo (en implementación) / SIIF (caratulación)',
+   quien:'El responsable del fondo de caja chica de cada área del Ministerio.',
+   req:'Comprobantes de gasto originales (facturas o tickets con CAE) · Formulario de rendición completo · Clasificación de gastos por partida presupuestaria · Retenciones impositivas aplicadas.',
+   pasos:['El responsable del fondo reúne los comprobantes de gasto originales y completa el formulario de rendición.','Se clasifican los gastos por partida presupuestaria y se calculan las retenciones impositivas.','Se presenta ante la Dirección de Administración, que eleva a Contaduría General.','Contaduría revisa y aprueba la rendición.','Tesorería repone el fondo de caja chica.'],
+   prob:'Proceso mixto digital/papel aún en algunas áreas. Clasificación de gastos manual por nomenclador presupuestario. Retenciones impositivas de cálculo complejo que generan errores frecuentes.',
+   kpis:[{n:'% de rendiciones presentadas sin errores al primer intento',d:'Sin medición.',m:'Meta: >80% sin correcciones en 60 días.'},{n:'Tiempo promedio de aprobación por Contaduría',d:'Sin medición.',m:'Meta: aprobación en 5 días hábiles.'}]},
+
+  {id:17,area:'admin',an:'Dirección de Administración',resp:'Pendiente (Mercedes — Jefa Dpto. Contable)',tipo:'interno',sem:'i',vn:5,
+   nombre:'Rendición de Publicidad',
+   desc:'Trámite de rendición mensual de gastos de publicidad del Ministerio, que se presenta ante la Dirección de Administración y eleva a Contaduría para su aprobación.',
+   tiempo:'1 a 2 semanas',vol:'Menos de 10/mes (mensual)',modal:'Mixto (papel + digital)',sis:'Excel / Word / SIIF (caratulación y envío de expedientes)',
+   quien:'La Secretaría de Administración del Ministerio.',
+   req:'Pendiente de completar — formulario entregado sin datos del Paso 1.',
+   pasos:['Pendiente de completar — la Responsable del área (Mercedes) no completó el Paso 1 del formulario.'],
+   prob:'Formulario incompleto: el Paso 1 (quién puede realizarlo y requisitos) no fue completado. Errores frecuentes en la redacción de documentación. Demoras por el circuito de firma del Ministro. Requiere nueva entrega del referente.',
+   kpis:[{n:'Completar relevamiento',d:'Formulario incompleto — falta Paso 1.',m:'Pendiente de completar por la referente del área.'}]},
+
+  // ── RR. INTERNACIONALES ─────────────────────────────
+  {id:7,area:'rr',an:'Dir. de Relaciones Internacionales',resp:'Isabel D. Figueredo',tipo:'externo',sem:'v',vn:30,
+   nombre:'Acceso a Becas, Subsidios y Asistencia Técnica de Organismos Nacionales e Internacionales',
+   desc:'Trámite mediante el cual personas, organizaciones de la sociedad civil, organismos públicos y universidades reciben asesoramiento y acompañamiento técnico para postular proyectos alineados con los ODS a convocatorias de becas, subsidios y programas de asistencia técnica financiados por organismos nacionales e internacionales. Disponible cuando se encuentre publicada una convocatoria activa en la web del Ministerio u otros canales oficiales.',
+   tiempo:'Más de 2 semanas',vol:'10–50/mes',modal:'Totalmente digital',sis:'Office / Drive / Gmail / WhatsApp',
+   quien:'Personas físicas mayores de 18 años, ONGs con personería jurídica, organismos públicos y universidades.',
+   req:'Becas: DNI · Pasaporte si corresponde · Certificado de salud · CV · Formulario de postulación · Nota de aval institucional · Proyecto vinculado a los ODS. ONGs: personería jurídica · formulario · nota de aval · proyecto. Organismos/universidades: formulario · nota de aval institucional · proyecto. Con financiamiento: presupuesto estimado del proyecto.',
+   pasos:['Este trámite se encuentra disponible únicamente cuando se informe que una convocatoria está abierta, a través de la página web del Ministerio u otros canales oficiales disponibles.','El interesado realiza la consulta inicial por correo electrónico (relinterycooperacion@gmail.com) o WhatsApp (3795039061).','La Dirección brinda asesoramiento personalizado (reunión presencial o virtual según preferencia).','Se asiste en la preparación y revisión de la documentación y el proyecto.','La persona o institución presenta el proyecto ante el organismo convocante. En casos específicos, la Dirección puede realizar la presentación directamente.'],
+   prob:'Canal de comunicación digital aún informal (Gmail personal y WhatsApp). Se recomienda establecer una dirección de correo institucional y canal de atención oficial.',
+   kpis:[{n:'Proyectos acompañados vs. aprobados',d:'Sin medición.',m:'Meta: tasa de aprobación >40%.'},{n:'Tiempo de respuesta a consultas iniciales',d:'Sin dato.',m:'Meta: respuesta en <48 hs hábiles.'},{n:'Canal digital institucional',d:'Gmail personal activo. Falta canal oficial.',m:'Meta: correo institucional activo en 30 días.'}]},
+
+  // ── RRHH ─────────────────────────────────────────────
+  {id:9,area:'rrhh',an:'Dpto. de Recursos Humanos',resp:'Matías Galarza',tipo:'interno',sem:'r',vn:30,
+   nombre:'Alta de Monotributistas',
+   desc:'Incorporación administrativa de personas contratadas bajo modalidad de monotributo, registrando su documentación y formalizando su situación en los sistemas y legajos institucionales.',
+   tiempo:'1 a 2 semanas',vol:'10–50/mes',modal:'Mixto (papel + digital)',sis:'SISPER / Planillas Excel',
+   quien:'El área de Recursos Humanos a partir de la instrucción del Ministro.',
+   req:'Instrucción formal de la autoridad competente · Documentación personal · Constancia de inscripción en AFIP como monotributista · Datos fiscales y bancarios.',
+   pasos:['Se recibe la instrucción formal de la autoridad competente.','El prestador entrega la documentación personal y fiscal requerida.','RRHH verifica la documentación y carga en SISPER.','Se arma el legajo institucional del prestador.','El prestador queda habilitado para desempeñar sus funciones.'],
+   prob:'Carga paralela en SISPER y planillas Excel. Duplicación de tareas y fragmentación de la información.',
+   kpis:[{n:'Tiempo promedio de alta',d:'Sin medición.',m:'Meta: alta en 5 días hábiles.'},{n:'% de legajos completos al cierre del mes',d:'Sin dato.',m:'Meta: 100% en sistema unificado.'}]},
+
+  {id:10,area:'rrhh',an:'Dpto. de Recursos Humanos',resp:'Matías Galarza',tipo:'interno',sem:'r',vn:5,
+   nombre:'Bajas de Personal (Fallecimiento / Jubilación)',
+   desc:'Se formaliza la desvinculación administrativa de un agente por fallecimiento o jubilación, actualizando su situación en los registros y sistemas institucionales.',
+   tiempo:'1 a 2 semanas',vol:'Menos de 10/mes',modal:'Mixto (papel + digital)',sis:'SISPER / Planillas Excel',
+   quien:'El agente que accede al beneficio jubilatorio o, en caso de fallecimiento, el área correspondiente o los familiares.',
+   req:'Decreto o resolución que disponga la baja · Documentación respaldatoria · Legajo actualizado.',
+   pasos:['Se recibe la documentación respaldatoria (resolución de jubilación o partida de defunción).','RRHH verifica y confecciona el acto administrativo de baja.','Se registra la baja en SISPER y en los registros internos.','Se actualiza el legajo del agente.','Se notifica a las áreas intervinientes (Liquidaciones, Tesorería, etc.).'],
+   prob:'Múltiples cargas manuales en registros paralelos. Riesgo de inconsistencias entre sistemas.',
+   kpis:[{n:'Tiempo promedio de baja desde notificación',d:'Sin medición.',m:'Meta: baja registrada en 5 días hábiles.'},{n:'Inconsistencias entre sistemas',d:'Sin medición.',m:'Meta: 0 con sistema unificado.'}]},
+
+  {id:11,area:'rrhh',an:'Dpto. de Recursos Humanos',resp:'Matías Galarza',tipo:'interno',sem:'r',vn:130,
+   nombre:'Registro de Novedades del Personal (Licencias, Inasistencias y Títulos)',
+   desc:'Se registran y actualizan las novedades administrativas del personal: licencias, inasistencias y acreditación de títulos, a partir de los informes remitidos por las distintas áreas.',
+   tiempo:'1 a 3 días hábiles',vol:'50–200/mes',modal:'Mixto (papel + digital)',sis:'SISPER / Planillas Excel',
+   quien:'Cualquier agente público del Ministerio que necesite informar una licencia, justificar una inasistencia o presentar títulos para su incorporación al legajo.',
+   req:'Nota o formulario correspondiente · Certificado médico, constancia o título según el tipo de novedad · Presentación dentro de los plazos normativos.',
+   pasos:['El agente o jefe de área presenta la nota con documentación correspondiente.','RRHH verifica la documentación y los plazos normativos.','Se registra la novedad en SISPER.','Se actualiza el legajo del agente.','Se notifica la confirmación al área solicitante.'],
+   prob:'Carga en múltiples planillas paralelas. Duplicación de datos y mayor esfuerzo manual.',
+   kpis:[{n:'% de novedades registradas en término',d:'Sin medición.',m:'Meta: 95% en plazo con sistema único.'},{n:'Tiempo promedio de registro',d:'Estimado 1–3 días.',m:'Meta: registro el mismo día con digitalización.'}]},
+
+  // ── PLANIFICACIÓN URBANA ─────────────────────────────
+  {id:12,area:'planif',an:'Subsec. de Proyectos y Planificación Urbana',resp:'Magali Poupard',tipo:'externo',sem:'a',vn:30,
+   nombre:'Solicitud de Proyecto, Asesoramiento y Planificación Urbana',
+   desc:'Municipios, organismos públicos, instituciones o particulares pueden solicitar asesoramiento técnico, planificación urbana, elaboración de proyectos y asistencia para el desarrollo de obras e intervenciones urbanas.',
+   tiempo:'1 a 2 semanas / Más de 2 semanas según complejidad',vol:'10–50/mes',modal:'Mixto (papel + digital)',sis:'MuniRed / Herramientas GIS',
+   quien:'Municipios, organismos públicos, instituciones y particulares que necesiten asistencia técnica o planificación urbana.',
+   req:'Nota formal de solicitud · Detalle del proyecto o necesidad · Documentación técnica disponible (planos, croquis, ubicación, antecedentes catastrales) · Datos de contacto.',
+   pasos:['El solicitante presenta la nota en Mesa de Entradas o por sistema MuniRed.','El área evalúa la solicitud y determina el tipo de asistencia requerida.','Se asigna el equipo técnico y se inicia el análisis y desarrollo del proyecto.','Se realizan validaciones con organismos externos si corresponde.','El solicitante recibe el Informe Técnico Final con propuestas y documentación.'],
+   prob:'Demoras por falta de documentación técnica base al inicio. Validaciones de organismos externos y tiempos vinculados a aprobaciones.',
+   kpis:[{n:'Tiempo promedio de primera respuesta',d:'Sin medición.',m:'Meta: primera respuesta en 5 días hábiles.'},{n:'% solicitudes con documentación completa al inicio',d:'Sin dato.',m:'Meta: >70% con formulario estructurado.'},{n:'Proyectos finalizados vs. iniciados',d:'Sin medición.',m:'Meta: tasa de cierre >80% mensual.'}]},
+
+  // ── GIRSU ────────────────────────────────────────────
+  {id:18,area:'girsu',an:'Unidad Ejecutora GIRSU',resp:'Ozimek Adrián',tipo:'externo',sem:'i',vn:0,
+   nombre:'Red Provincial de Puntos Verdes',
+   desc:'Pendiente de completar — trámite vinculado a la Red Provincial de Puntos Verdes de la Unidad Ejecutora GIRSU. El relevamiento fue iniciado el 27/05/2026 pero los pasos del trámite (Paso 1, 2 y 3) no fueron completados.',
+   tiempo:'Más de 2 semanas',vol:'Menos de 10/mes',modal:'Totalmente digital',sis:'Pendiente de completar',
+   quien:'Pendiente de completar.',
+   req:'Pendiente de completar.',
+   pasos:['Pendiente de completar — el referente (Adrián Ozimek, girsucorrientes@gmail.com, Tel: 1131902950) debe completar los 3 pasos del trámite.'],
+   prob:'Relevamiento incompleto: los 3 pasos del trámite están en blanco. Pendiente de completar por el referente del área.',
+   kpis:[{n:'Completar relevamiento',d:'Pasos 1, 2 y 3 sin completar.',m:'Pendiente de nueva entrega del referente.'}]},
+
+  {id:19,area:'girsu',an:'Unidad Ejecutora GIRSU',resp:'Ozimek Adrián',tipo:'interno',sem:'i',vn:0,
+   nombre:'Diagnóstico y Relevamiento GIRSU',
+   desc:'Pendiente de completar — trámite vinculado al proceso de diagnóstico y relevamiento de la Unidad Ejecutora GIRSU. El relevamiento fue iniciado el 27/05/2026 pero los pasos del trámite no fueron completados.',
+   tiempo:'Más de 2 semanas',vol:'Menos de 10/mes',modal:'Totalmente digital',sis:'Pendiente de completar',
+   quien:'Pendiente de completar.',
+   req:'Pendiente de completar.',
+   pasos:['Pendiente de completar — el referente debe completar los 3 pasos del trámite.'],
+   prob:'Relevamiento incompleto: los 3 pasos del trámite están en blanco. También falta determinar si es externo o interno.',
+   kpis:[{n:'Completar relevamiento',d:'Tipo de trámite, pasos y descripción sin completar.',m:'Pendiente de nueva entrega del referente.'}]},
+
+  // ── RELACIONES INSTITUCIONALES ────────────────────────
+  {id:20,area:'relinst',an:'Dir. de Relaciones Institucionales y Soc. Civil',resp:'Dr. Belén Vergez',tipo:'externo',sem:'v',vn:20,
+   nombre:'Solicitud de Apoyo Económico para Organizaciones de la Sociedad Civil',
+   desc:'Trámite mediante el cual organizaciones de la sociedad civil, municipios u organismos pueden solicitar asistencia institucional al Ministerio. Cuenta con formulario digital y plantilla de nota de solicitud para orientar al ciudadano.',
+   tiempo:'Más de 2 semanas',vol:'10–50/mes',modal:'Mixto (papel + digital)',sis:'Google Forms / Drive',
+   quien:'Organizaciones de la sociedad civil, municipios, organismos públicos e instituciones que requieran asistencia institucional del Ministerio.',
+   req:'Completar el formulario de asistencia institucional en línea · Presentar nota de solicitud firmada usando la plantilla oficial · Datos de contacto del referente. Sin costo.',
+   pasos:[
+     '1. Completar el formulario de asistencia institucional disponible en: https://forms.gle/XXoh6w3TfAqpmyxEA',
+     '2. Descargar y completar la plantilla de nota de solicitud disponible en: https://acortar.link/OZajQ1',
+     '3. Presentar la nota firmada en Mesa de Entradas — 25 de Mayo 1041, Corrientes. Lunes a viernes de 7:30 a 13:00 hs.',
+     '4. La Dirección evalúa la solicitud y contacta al referente para coordinar la asistencia.',
+     '5. Se brinda la asistencia institucional acordada y se emite la documentación correspondiente.'
+   ],
+   prob:'Proceso en vías de digitalización. Los formularios y plantillas online agilizan el inicio del trámite y reducen visitas innecesarias.',
+   kpis:[
+     {n:'% de solicitudes iniciadas por formulario digital',d:'En implementación.',m:'Meta: >70% por canal digital en 60 días.'},
+     {n:'Tiempo promedio de respuesta',d:'Sin medición formal.',m:'Meta: primera respuesta en 5 días hábiles.'}
+   ]},
+
+  {id:21,area:'relinst',an:'Dir. de Relaciones Institucionales y Soc. Civil',resp:'Dr. Belén Vergez',tipo:'externo',sem:'v',vn:20,
+   nombre:'Asistencia y Acompañamiento a Instituciones de Bien Público y Entidades Sociales sin Fines de Lucro',
+   desc:'Trámite para que cualquier ciudadano, organismo o institución presente una nota formal usando la plantilla oficial disponible en línea, lo que reduce errores y agiliza el circuito administrativo.',
+   tiempo:'Más de 2 semanas (resolución)',vol:'10–50/mes',modal:'Mixto (papel + digital)',sis:'Google Forms / Drive',
+   quien:'Cualquier ciudadano, municipio, organismo público o institución que necesite presentar una solicitud formal ante el Ministerio.',
+   req:'Nota completada usando la plantilla oficial (disponible en línea) · Original y copia · Firma del presentante o autoridad competente · Datos de contacto. Sin costo.',
+   pasos:[
+     '1. Descargar y completar la plantilla oficial de nota de solicitud: https://acortar.link/OZajQ1',
+     '2. Firmar la nota con los datos del presentante o autoridad.',
+     '3. Presentar original y copia en Mesa de Entradas — 25 de Mayo 1041, Corrientes. Lunes a viernes de 7:30 a 13:00 hs.',
+     '4. Mesa de Entradas sella la copia como constancia de ingreso y la devuelve al presentante.',
+     '5. La nota es derivada al área competente para su resolución y respuesta.'
+   ],
+   prob:'Sin plazo de respuesta formal. Se recomienda establecer notificación al presentante sobre el estado de su solicitud.',
+   kpis:[
+     {n:'% de notas con plantilla oficial',d:'Sin medición. Inicio de implementación.',m:'Meta: >80% con plantilla en 60 días.'},
+     {n:'Tiempo promedio de respuesta',d:'Sin medición.',m:'Meta: publicar y cumplir plazo máximo definido.'}
+   ]}
+];
+
+// Mapa de áreas
+const AREAS = {
+  todos:'Todos',
+  mesa:'Mesa de Entradas',
+  compras:'Dpto. de Compras',
+  admin:'Dir. Administración',
+  rr:'Dir. RR. Internacionales',
+  rrhh:'Dpto. de RRHH',
+  planif:'Subsec. Plan. Urbana',
+  girsu:'GIRSU',
+  relinst:'Dir. Rel. Institucionales'
+};
+
+const filtros = {area:'todos',tipo:'todos',sem:'todos',especial:''};
+let openId = null;
+
+function semLabel(s){
+  const m={
+    v:['verde','🟢 Listo para publicar'],
+    a:['amarillo','🟡 En revisión — requiere ajuste'],
+    r:['rojo','🔴 Requiere mejora de proceso'],
+    i:['incompleto','⚫ Relevamiento incompleto']
+  };
+  return `<div class="sem-b ${m[s][0]}"><span class="sd"></span>${m[s][1]}</div>`;
+}
+function semClass(s){return{v:'sv',a:'sa',r:'sr',i:'si'}[s]||'si'}
+function semPill(s){
+  if(s==='v') return '<span class="pill pverde">🟢 Publicar</span>';
+  if(s==='a') return '<span class="pill pamar">🟡 Revisar</span>';
+  if(s==='i') return '<span class="pill pinc">⚫ Incompleto</span>';
+  return '<span class="pill projo">🔴 Mejorar</span>';
+}
+
+function getFiltered(){
+  let r = T.filter(t=>{
+    if(filtros.area!=='todos'&&t.area!==filtros.area)return false;
+    if(filtros.tipo!=='todos'&&t.tipo!==filtros.tipo)return false;
+    if(filtros.sem!=='todos'&&t.sem!==filtros.sem)return false;
+    return true;
+  });
+  if(filtros.especial==='volumen') r = [...r].filter(t=>t.vn>0).sort((a,b)=>b.vn-a.vn);
+  return r;
+}
+
+function render(){
+  const f = getFiltered();
+  const grid = document.getElementById('grid');
+  const nr   = document.getElementById('noRes');
+  if(!f.length){grid.innerHTML='';nr.style.display='block';return}
+  nr.style.display='none';
+  const showRank = filtros.especial==='volumen';
+
+  grid.innerHTML=f.map((t,idx)=>`
+    <div class="tc ${t.tipo} ${semClass(t.sem)}" id="tc${t.id}" onclick="toggle(${t.id})" style="position:relative">
+      ${showRank?`<div style="position:absolute;top:0;right:0;background:var(--oro);color:var(--azul);font-family:'Syne',sans-serif;font-weight:800;font-size:10px;padding:3px 10px;border-radius:0 10px 0 8px">#${idx+1} Mayor volumen</div>`:''}
+      <div class="tc-head">
+        <div class="tc-top">
+          <div class="tc-nombre">${t.nombre}</div>
+          <span class="tc-tipo ${t.tipo}">${t.tipo==='externo'?'🌐 Ext':'🔒 Int'}</span>
+        </div>
+        <div class="tc-area">${t.an} · ${t.resp}</div>
+        <div class="tc-desc">${t.desc.length>120?t.desc.substring(0,120)+'...':t.desc}</div>
+      </div>
+      <div class="tc-pills">
+        <span class="pill pt">⏱ ${t.tiempo}</span>
+        <span class="pill pm">${t.modal}</span>
+        <span class="pill pv">📊 ${t.vol}</span>
+        ${semPill(t.sem)}
+      </div>
+      <div class="tc-exp">Ver detalle completo</div>
+      <div class="tc-det" id="det${t.id}">
+        <div class="dt-tabs">
+          <div class="dt-tab active" onclick="dtTab(event,${t.id},'i')">ℹ️ Info</div>
+          <div class="dt-tab" onclick="dtTab(event,${t.id},'p')">📋 Pasos</div>
+          <div class="dt-tab" onclick="dtTab(event,${t.id},'k')">📊 KPIs</div>
+        </div>
+        <div class="dt-panel active" id="det${t.id}i">
+          ${semLabel(t.sem)}
+          <div class="dr"><span class="dk">¿Quién solicita?</span><span class="dv">${t.quien}</span></div>
+          <div class="dr"><span class="dk">Requisitos</span><span class="dv">${t.req}</span></div>
+          <div class="dr"><span class="dk">Tiempo</span><span class="dv">${t.tiempo}</span></div>
+          <div class="dr"><span class="dk">Volumen</span><span class="dv">${t.vol}</span></div>
+          <div class="dr"><span class="dk">Modalidad</span><span class="dv">${t.modal}</span></div>
+          <div class="dr"><span class="dk">Sistema</span><span class="dv">${t.sis}</span></div>
+          <div class="prob"><strong>⚠ Problema / Estado</strong><p>${t.prob}</p></div>
+        </div>
+        <div class="dt-panel" id="det${t.id}p">
+          ${t.pasos.map((p,i)=>`<div class="pm-row"><div class="pm-n">${i+1}</div><div class="pm-t">${p}</div></div>`).join('')}
+        </div>
+        <div class="dt-panel" id="det${t.id}k">
+          ${t.kpis.map(k=>`<div class="ki"><div class="kn">${k.n}</div><div class="kd">${k.d}</div><div class="km">${k.m}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggle(id){
+  const card=document.getElementById('tc'+id);
+  if(openId&&openId!==id){const prev=document.getElementById('tc'+openId);if(prev)prev.classList.remove('open');}
+  const isOpen=card.classList.contains('open');
+  card.classList.toggle('open',!isOpen);
+  openId=isOpen?null:id;
+}
+
+function dtTab(e,id,tab){
+  e.stopPropagation();
+  const det=document.getElementById('det'+id);
+  det.querySelectorAll('.dt-tab').forEach(t=>t.classList.remove('active'));
+  det.querySelectorAll('.dt-panel').forEach(p=>p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('det'+id+tab).classList.add('active');
+}
+
+function setF(key,val,btn){
+  filtros[key]=val;
+  // Limpiar todos los botones del mismo div.filtros que contiene al btn
+  const row = btn.closest('.filtros');
+  if(row){
+    // Solo desactivar botones del mismo "grupo lógico" según el key
+    row.querySelectorAll('.fbtn').forEach(b=>{
+      const oc = b.getAttribute('onclick')||'';
+      if(oc.includes("'"+key+"'")) b.classList.remove('active');
+    });
+  }
+  btn.classList.add('active');
+  if(key==='tipo'){ filtros.especial=''; document.querySelectorAll('.fbtn-esp').forEach(b=>b.classList.remove('active')); }
+  if(key==='especial'){ filtros.tipo='todos'; document.querySelectorAll('.fbtn-tipo').forEach(b=>b.classList.remove('active')); const t=document.querySelector('.fbtn-tipo-todos'); if(t)t.classList.add('active'); }
+  openId=null;
+  render();
+}
+
+function showTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+
+render();
+</script>
+</body>
+</html>
