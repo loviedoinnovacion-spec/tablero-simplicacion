@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Guías de Trámites — Simplificación Administrativa · Corrientes 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --azul-oscuro:#0D2B5E;
+  --azul-medio:#1A4A9E;
+  --azul-claro:#2E6DD4;
+  --azul-suave:#E3EDFF;
+  --verde:#1B6B3A;
+  --verde-bg:#E8F5E9;
+  --amber:#92500A;
+  --amber-bg:#FFF3CD;
+  --gris-bg:#F4F6FB;
+  --gris-borde:#DDE3EF;
+  --texto:#1A2340;
+  --texto-sub:#4A5578;
+  --blanco:#FFFFFF;
+  --sidebar-w:260px;
+  --header-h:64px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--gris-bg);color:var(--texto);font-size:15px}
+a{color:inherit;text-decoration:none}
+
+/* ── LAYOUT ── */
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--azul-oscuro);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:var(--header-h);min-height:var(--header-h);background:var(--blanco);border-bottom:1px solid var(--gris-borde);display:flex;align-items:center;padding:0 28px;gap:16px}
+.content{flex:1;overflow-y:auto;padding:28px}
+
+/* ── SIDEBAR ── */
+.sb-head{padding:24px 20px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-logo{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px}
+.sb-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--blanco);line-height:1.2}
+.sb-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:4px}
+.sb-nav{flex:1;overflow-y:auto;padding:12px 0}
+.sb-section{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:14px 20px 6px}
+.sb-item{display:flex;align-items:center;gap:12px;padding:10px 20px;cursor:pointer;transition:background .15s;border-left:3px solid transparent}
+.sb-item:hover{background:rgba(255,255,255,.07)}
+.sb-item.active{background:rgba(46,109,212,.25);border-left-color:var(--azul-claro)}
+.sb-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:rgba(255,255,255,.1)}
+.sb-item.active .sb-icon{background:var(--azul-claro)}
+.sb-label{font-size:13px;font-weight:500;color:rgba(255,255,255,.8);line-height:1.2}
+.sb-item.active .sb-label{color:var(--blanco);font-weight:600}
+.sb-badge{margin-left:auto;background:var(--azul-claro);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+.sb-foot{padding:14px 20px;border-top:1px solid rgba(255,255,255,.1);font-size:10px;color:rgba(255,255,255,.3)}
+
+/* ── TOPBAR ── */
+.tb-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--azul-oscuro)}
+.tb-sub{font-size:12px;color:var(--texto-sub);margin-left:auto}
+.tb-chip{background:var(--azul-suave);color:var(--azul-medio);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── RESUMEN GENERAL ── */
+.gen-header{background:linear-gradient(135deg,var(--azul-oscuro) 0%,var(--azul-medio) 100%);border-radius:16px;padding:28px 32px;color:#fff;margin-bottom:24px}
+.gen-eyebrow{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:8px}
+.gen-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1.2;margin-bottom:6px}
+.gen-sub{font-size:13px;opacity:.7}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-top:22px}
+.stat{background:rgba(255,255,255,.12);border-radius:10px;padding:14px 18px;border:1px solid rgba(255,255,255,.15)}
+.stat-n{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1}
+.stat-l{font-size:11px;opacity:.7;margin-top:4px}
+
+.sec-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--azul-oscuro);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+
+/* Tabla de progreso organismos */
+.org-table{background:var(--blanco);border-radius:12px;border:1px solid var(--gris-borde);overflow:hidden;margin-bottom:24px}
+.org-table table{width:100%;border-collapse:collapse}
+.org-table th{background:var(--azul-oscuro);color:#fff;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:11px 16px;text-align:left}
+.org-table td{padding:13px 16px;font-size:13px;border-bottom:1px solid var(--gris-borde);vertical-align:middle}
+.org-table tr:last-child td{border-bottom:none}
+.org-table tr:hover td{background:#F8FAFF}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.pill.verde{background:var(--verde-bg);color:var(--verde)}
+.pill.azul{background:var(--azul-suave);color:var(--azul-medio)}
+.pill.amber{background:var(--amber-bg);color:var(--amber)}
+.pill.gris{background:#F0F2F7;color:var(--texto-sub)}
+
+.prog-bar{background:#E8ECF5;border-radius:20px;height:7px;width:100px;overflow:hidden;display:inline-block}
+.prog-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--azul-claro),var(--azul-medio))}
+
+/* Cards de guías */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:24px}
+.guia-card{background:var(--blanco);border-radius:14px;border:1px solid var(--gris-borde);overflow:hidden;transition:box-shadow .2s,transform .15s;cursor:pointer}
+.guia-card:hover{box-shadow:0 6px 24px rgba(13,43,94,.12);transform:translateY(-2px)}
+.gc-head{padding:20px 20px 14px;border-bottom:1px solid var(--gris-borde)}
+.gc-org{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.gc-name{font-size:15px;font-weight:700;color:var(--texto);line-height:1.3}
+.gc-body{padding:14px 20px}
+.gc-row{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--texto-sub);margin-bottom:8px}
+.gc-row:last-child{margin-bottom:0}
+.gc-row svg{flex-shrink:0;margin-top:1px}
+.gc-footer{padding:10px 20px 14px;display:flex;align-items:center;gap:8px}
+
+/* ── GUÍA DETALLE ── */
+.guia-wrap{background:var(--blanco);border-radius:16px;border:1px solid var(--gris-borde);overflow:hidden;max-width:820px;margin:0 auto}
+.guia-hero{padding:28px 32px;color:#fff}
+.guia-hero .org-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.75;margin-bottom:8px}
+.guia-hero h1{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1.25;margin-bottom:8px}
+.guia-hero .desc{font-size:13px;opacity:.85;line-height:1.6}
+.guia-meta{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.meta-chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600}
+
+.guia-steps{padding:24px 32px}
+.step{display:flex;gap:18px;margin-bottom:26px}
+.step:last-child{margin-bottom:0}
+.step-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.step-body{flex:1;padding-top:4px}
+.step-title{font-size:14px;font-weight:700;color:var(--texto);margin-bottom:6px}
+.step-text{font-size:13px;color:var(--texto-sub);line-height:1.65}
+.step-text strong{color:var(--texto)}
+.step-line{width:2px;background:var(--gris-borde);margin-left:17px;height:18px;margin-bottom:8px}
+
+.req-box{background:var(--gris-bg);border:1px solid var(--gris-borde);border-radius:10px;padding:16px 18px;margin-top:10px}
+.req-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--texto-sub);padding:5px 0;border-bottom:1px dashed #E0E4EF}
+.req-item:last-child{border-bottom:none}
+.req-item .num{background:var(--azul-medio);color:#fff;border-radius:4px;font-size:10px;font-weight:700;padding:2px 6px;flex-shrink:0;margin-top:1px}
+.req-note{background:var(--amber-bg);border-left:3px solid #D97706;border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:12px;color:var(--amber);line-height:1.5}
+
+.plazo-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.plazo-item{background:var(--blanco);border:1px solid var(--gris-borde);border-radius:10px;padding:12px 14px;text-align:center}
+.plazo-n{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--azul-medio)}
+.plazo-l{font-size:11px;color:var(--texto-sub);margin-top:2px}
+
+.guia-footer{background:var(--gris-bg);border-top:1px solid var(--gris-borde);padding:16px 32px;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--texto-sub)}
+.contact-item{display:flex;align-items:center;gap:5px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:var(--azul-suave);color:var(--azul-medio);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;cursor:pointer;border:none;font-family:inherit;margin-bottom:20px;transition:background .15s}
+.back-btn:hover{background:#C8DCFF}
+
+/* ── APP SOLAPAS ── */
+.app-tabs{display:flex;gap:2px;background:var(--gris-bg);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content}
+.app-tab{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--texto-sub);transition:all .15s;border:none;background:none;font-family:inherit}
+.app-tab.active{background:var(--blanco);color:var(--azul-oscuro);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+.tramite-list{display:flex;flex-direction:column;gap:14px}
+.tramite-row{background:var(--blanco);border-radius:12px;border:1px solid var(--gris-borde);display:flex;align-items:center;gap:16px;padding:16px 20px;cursor:pointer;transition:box-shadow .2s,border-color .15s}
+.tramite-row:hover{box-shadow:0 4px 16px rgba(13,43,94,.1);border-color:#BCCFEF}
+.tr-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.tr-info{flex:1}
+.tr-org{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.tr-name{font-size:14px;font-weight:700;color:var(--texto);line-height:1.3}
+.tr-meta{font-size:12px;color:var(--texto-sub);margin-top:3px}
+.tr-arrow{color:var(--texto-sub);font-size:18px}
+
+/* Colores por organismo */
+.color-mds{background:#1B6B3A;}.color-mds-bg{background:#E8F5E9;color:#1B6B3A;}
+.color-icaa{background:#0D6B6B;}.color-icaa-bg{background:#E0F5F5;color:#0D6B6B;}
+.color-mcyp{background:#0D2B5E;}.color-mcyp-bg{background:#E3EDFF;color:#0D2B5E;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .sidebar{width:56px;min-width:56px}.sb-label,.sb-head .sb-title,.sb-head .sb-sub,.sb-head .sb-logo,.sb-section,.sb-badge,.sb-foot,.tb-sub{display:none}
+  .sb-item{padding:12px;justify-content:center}.sb-icon{margin:0}
+  .content{padding:16px}.stats-row{grid-template-columns:repeat(2,1fr)}
+  .plazo-row{grid-template-columns:1fr}
+  .guia-steps,.guia-hero{padding:20px}
+  .guia-footer{flex-direction:column;align-items:flex-start;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ══════ SIDEBAR ══════ -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">IMI · Corrientes</div>
+      <div class="sb-title">Simplificación<br>Administrativa</div>
+      <div class="sb-sub">Provincia de Corrientes · 2026</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <div class="sb-item active" onclick="showPanel('resumen',this)">
+        <div class="sb-icon">📊</div>
+        <div class="sb-label">Resumen General</div>
+      </div>
+      <div class="sb-item" onclick="showPanel('guias',this)">
+        <div class="sb-icon">📋</div>
+        <div class="sb-label">Guías de Trámites</div>
+        <span class="sb-badge">3</span>
+      </div>
+      <div class="sb-section">Organismos</div>
+      <div class="sb-item" onclick="showPanel('guias',this);openTramite('mds-pasajes')">
+        <div class="sb-icon">🤝</div>
+        <div class="sb-label">Min. Desarrollo Social</div>
+      </div>
+      <div class="sb-item" onclick="showPanel('guias',this);openTramite('icaa-residuos')">
+        <div class="sb-icon">🌿</div>
+        <div class="sb-label">ICAA</div>
+      </div>
+      <div class="sb-item" onclick="showPanel('guias',this);openTramite('mcyp-firma')">
+        <div class="sb-icon">📝</div>
+        <div class="sb-label">Min. Coordinación</div>
+      </div>
+    </div>
+    <div class="sb-foot">Corrientes · Junio 2026 · v1.0</div>
+  </div>
+
+  <!-- ══════ MAIN ══════ -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">Resumen General</div>
+      <span class="tb-chip" id="tb-chip">Panel Provincial</span>
+      <div class="tb-sub">IMI — Instituto de Modernización e Innovación</div>
+    </div>
+    <div class="content">
+
+      <!-- ═══ PANEL: RESUMEN GENERAL ═══ -->
+      <div class="panel active" id="panel-resumen">
+        <div class="gen-header">
+          <div class="gen-eyebrow">Gobierno de Corrientes · IMI</div>
+          <div class="gen-title">Programa de Simplificación Administrativa<br>y Mejora de Experiencia del Ciudadano</div>
+          <div class="gen-sub">Instituto de Modernización e Innovación · Panel Provincial · Junio 2026</div>
+          <div class="stats-row">
+            <div class="stat"><div class="stat-n">3</div><div class="stat-l">Organismos en guía</div></div>
+            <div class="stat"><div class="stat-n">3</div><div class="stat-l">Trámites listos para publicar</div></div>
+            <div class="stat"><div class="stat-n">19</div><div class="stat-l">Organismos en el programa</div></div>
+            <div class="stat"><div class="stat-n">24+</div><div class="stat-l">Trámites relevados</div></div>
+          </div>
+        </div>
+
+        <div class="sec-title">Estado de guías por organismo</div>
+        <div class="org-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Organismo</th>
+                <th>Trámite</th>
+                <th>Estado guía</th>
+                <th>Modalidad actual</th>
+                <th>Plazo estimado</th>
+                <th>Progreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:var(--verde)">MDS</strong><br><span style="font-size:11px;color:var(--texto-sub)">Ministerio de Desarrollo Social</span></td>
+                <td style="font-weight:600">Solicitud de Pasajes</td>
+                <td><span class="pill verde">✓ Lista para publicar</span></td>
+                <td><span class="pill gris">En papel</span></td>
+                <td>Inmediato</td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div></td>
+              </tr>
+              <tr>
+                <td><strong style="color:#0D6B6B">ICAA</strong><br><span style="font-size:11px;color:var(--texto-sub)">Inst. Correntino del Agua y del Ambiente</span></td>
+                <td style="font-weight:600">Residuos Patológicos — Inscripción</td>
+                <td><span class="pill verde">✓ Lista para publicar</span></td>
+                <td><span class="pill gris">En papel</span></td>
+                <td>1–2 semanas</td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div></td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--azul-oscuro)">MCyP</strong><br><span style="font-size:11px;color:var(--texto-sub)">Min. Coordinación y Planificación</span></td>
+                <td style="font-weight:600">Certificación de Firma — Renovación Lic. Conducir</td>
+                <td><span class="pill verde">✓ Lista para publicar</span></td>
+                <td><span class="pill gris">Presencial</span></td>
+                <td>En el momento</td>
+                <td><div class="prog-bar"><div class="prog-fill" style="width:100%"></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sec-title">Acceso rápido a guías de trámites</div>
+        <div class="cards-grid">
+          <div class="guia-card" onclick="showPanel('guias',null);openTramite('mds-pasajes')">
+            <div class="gc-head">
+              <div class="gc-org color-mds-bg" style="display:inline-block;padding:3px 10px;border-radius:20px;margin-bottom:8px">MDS — Desarrollo Social</div>
+              <div class="gc-name">Solicitud de Pasajes</div>
+            </div>
+            <div class="gc-body">
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Personas con necesidades de traslado
+              </div>
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Resolución inmediata
+              </div>
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>
+                Presencial — Min. Desarrollo Social
+              </div>
+            </div>
+            <div class="gc-footer">
+              <span class="pill verde">✓ Publicable</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--azul-claro);font-weight:600">Ver guía →</span>
+            </div>
+          </div>
+
+          <div class="guia-card" onclick="showPanel('guias',null);openTramite('icaa-residuos')">
+            <div class="gc-head">
+              <div class="gc-org color-icaa-bg" style="display:inline-block;padding:3px 10px;border-radius:20px;margin-bottom:8px">ICAA — Agua y Ambiente</div>
+              <div class="gc-name">Inscripción Residuos Patológicos</div>
+            </div>
+            <div class="gc-body">
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Hospitales, clínicas, laboratorios, transportistas
+              </div>
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                1 a 2 semanas hábiles
+              </div>
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>
+                Mesa de Entradas ICAA — Bolívar 2275
+              </div>
+            </div>
+            <div class="gc-footer">
+              <span class="pill verde">✓ Publicable</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--azul-claro);font-weight:600">Ver guía →</span>
+            </div>
+          </div>
+
+          <div class="guia-card" onclick="showPanel('guias',null);openTramite('mcyp-firma')">
+            <div class="gc-head">
+              <div class="gc-org color-mcyp-bg" style="display:inline-block;padding:3px 10px;border-radius:20px;margin-bottom:8px">MCyP — Coordinación y Planificación</div>
+              <div class="gc-name">Certificación de Firma — Renovación Licencia</div>
+            </div>
+            <div class="gc-body">
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                Intendentes y Viceintendentes de Corrientes
+              </div>
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Resolución en el momento
+              </div>
+              <div class="gc-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/></svg>
+                Min. Coordinación y Planificación
+              </div>
+            </div>
+            <div class="gc-footer">
+              <span class="pill verde">✓ Publicable</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--azul-claro);font-weight:600">Ver guía →</span>
+            </div>
+          </div>
+        </div>
+      </div><!-- /panel-resumen -->
+
+      <!-- ═══ PANEL: GUÍAS DE TRÁMITES ═══ -->
+      <div class="panel" id="panel-guias">
+
+        <!-- LISTADO (default) -->
+        <div id="view-lista">
+          <div class="app-tabs">
+            <button class="app-tab active">Todas las guías</button>
+            <button class="app-tab" onclick="filterOrg('MDS')">MDS</button>
+            <button class="app-tab" onclick="filterOrg('ICAA')">ICAA</button>
+            <button class="app-tab" onclick="filterOrg('MCyP')">MCyP</button>
+          </div>
+
+          <div class="tramite-list" id="tramite-list">
+            <div class="tramite-row" data-org="MDS" onclick="openTramite('mds-pasajes')">
+              <div class="tr-icon" style="background:#E8F5E9">🎫</div>
+              <div class="tr-info">
+                <div class="tr-org" style="color:var(--verde)">MDS — Ministerio de Desarrollo Social</div>
+                <div class="tr-name">Solicitud de Pasajes</div>
+                <div class="tr-meta">Resolución inmediata · Presencial</div>
+              </div>
+              <span class="pill verde" style="white-space:nowrap">✓ Publicable</span>
+              <span class="tr-arrow">›</span>
+            </div>
+
+            <div class="tramite-row" data-org="ICAA" onclick="openTramite('icaa-residuos')">
+              <div class="tr-icon" style="background:#E0F5F5">🧬</div>
+              <div class="tr-info">
+                <div class="tr-org" style="color:#0D6B6B">ICAA — Instituto Correntino del Agua y del Ambiente</div>
+                <div class="tr-name">Inscripción en el Registro de Generadores, Operadores y Transportistas de Residuos Peligrosos (Patológicos)</div>
+                <div class="tr-meta">1–2 semanas · Presencial en Mesa de Entradas</div>
+              </div>
+              <span class="pill verde" style="white-space:nowrap">✓ Publicable</span>
+              <span class="tr-arrow">›</span>
+            </div>
+
+            <div class="tramite-row" data-org="MCyP" onclick="openTramite('mcyp-firma')">
+              <div class="tr-icon" style="background:#E3EDFF">✍️</div>
+              <div class="tr-info">
+                <div class="tr-org" style="color:var(--azul-oscuro)">MCyP — Ministerio de Coordinación y Planificación</div>
+                <div class="tr-name">Certificación de Firma de Intendentes y Viceintendentes para Renovación de Licencia de Conducir</div>
+                <div class="tr-meta">En el momento · Presencial</div>
+              </div>
+              <span class="pill verde" style="white-space:nowrap">✓ Publicable</span>
+              <span class="tr-arrow">›</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ DETALLE: MDS — PASAJES ═══ -->
+        <div id="view-mds-pasajes" style="display:none">
+          <button class="back-btn" onclick="backToList()">← Volver a todas las guías</button>
+          <div class="guia-wrap">
+            <div class="guia-hero" style="background:linear-gradient(135deg,#1B5E3B 0%,#2E7D52 100%)">
+              <div class="org-label">MDS — Ministerio de Desarrollo Social · Provincia de Corrientes</div>
+              <h1>Solicitud de Pasajes</h1>
+              <p class="desc">Trámite mediante el cual personas en situación de vulnerabilidad social o con necesidades de traslado pueden solicitar pasajes para acceder a prestaciones de salud, educación u otras necesidades urgentes.</p>
+              <div class="guia-meta">
+                <span class="meta-chip">🕐 Resolución inmediata</span>
+                <span class="meta-chip">📍 Presencial</span>
+                <span class="meta-chip">🆓 Sin costo</span>
+              </div>
+            </div>
+
+            <div class="guia-steps">
+              <div style="margin-bottom:24px">
+                <div class="sec-title" style="margin-bottom:12px">Pasos para realizar el trámite</div>
+              </div>
+
+              <div class="step">
+                <div>
+                  <div class="step-num" style="background:var(--verde)">1</div>
+                </div>
+                <div class="step-body">
+                  <div class="step-title">¿Quién puede solicitar y qué se necesita?</div>
+                  <div class="step-text">Personas en situación de vulnerabilidad social, con necesidad de traslado por motivos de salud, educativos o sociales urgentes. <strong>Presentarse personalmente</strong> en el Ministerio de Desarrollo Social con la documentación requerida.</div>
+                  <div class="req-box">
+                    <div class="req-item"><span class="num">1</span>DNI vigente del solicitante</div>
+                    <div class="req-item"><span class="num">2</span>Justificación del motivo del traslado (turno médico, citación, etc.)</div>
+                    <div class="req-item"><span class="num">3</span>Constancia de situación social (si se dispone)</div>
+                  </div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div>
+                  <div class="step-num" style="background:var(--verde)">2</div>
+                </div>
+                <div class="step-body">
+                  <div class="step-title">¿Cómo y dónde presentarse?</div>
+                  <div class="step-text">Acercarse a la <strong>Mesa de Entradas del Ministerio de Desarrollo Social</strong>, Corrientes Capital, en horario de atención. Explicar la necesidad al agente de guardia, quien evaluará el caso y derivará al área correspondiente.</div>
+                  <div class="req-note">⏰ Horario de atención: <strong>Lunes a viernes de 07:30 a 13:00 hs</strong></div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div>
+                  <div class="step-num" style="background:var(--verde)">3</div>
+                </div>
+                <div class="step-body">
+                  <div class="step-title">¿Qué sucede con mi solicitud?</div>
+                  <div class="step-text">El área social evalúa la solicitud y verifica la situación. Si se aprueba, se emite la autorización para la entrega del pasaje. El proceso es ágil y se resuelve <strong>en el momento o en pocas horas</strong>.</div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div>
+                  <div class="step-num" style="background:var(--verde)">4</div>
+                </div>
+                <div class="step-body">
+                  <div class="step-title">¿Qué recibo y cuándo?</div>
+                  <div class="step-text">Se entrega el <strong>pasaje o la autorización de viaje</strong> correspondiente. El trámite se resuelve en el día en la mayoría de los casos. Sin costo para el solicitante.</div>
+                  <div class="plazo-row">
+                    <div class="plazo-item"><div class="plazo-n">0</div><div class="plazo-l">Costo del trámite</div></div>
+                    <div class="plazo-item"><div class="plazo-n">1</div><div class="plazo-l">Visita necesaria</div></div>
+                    <div class="plazo-item"><div class="plazo-n">≈ 1 hs</div><div class="plazo-l">Tiempo de resolución</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="guia-footer">
+              <div class="contact-item">📍 Ministerio de Desarrollo Social — Corrientes Capital</div>
+              <div class="contact-item">⏰ Lun–Vie 07:30–13:00 hs</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ DETALLE: ICAA — RESIDUOS ═══ -->
+        <div id="view-icaa-residuos" style="display:none">
+          <button class="back-btn" onclick="backToList()">← Volver a todas las guías</button>
+          <div class="guia-wrap">
+            <div class="guia-hero" style="background:linear-gradient(135deg,#0D4A4A 0%,#0D6B6B 100%)">
+              <div class="org-label">ICAA — Instituto Correntino del Agua y del Ambiente · Provincia de Corrientes</div>
+              <h1>Inscripción en el Registro de Generadores, Operadores y Transportistas de Residuos Peligrosos (Patológicos)</h1>
+              <p class="desc">Trámite obligatorio mediante el cual hospitales, clínicas, centros médicos, laboratorios y transportistas de residuos patológicos deben inscribirse en el Registro Provincial de Residuos Peligrosos del ICAA. Garantiza la trazabilidad en el manejo de los residuos y el respaldo legal del establecimiento.</p>
+              <div class="guia-meta">
+                <span class="meta-chip">🕐 1 a 2 semanas</span>
+                <span class="meta-chip">📍 Presencial</span>
+                <span class="meta-chip">Res. ICAA 237/2021 y 240/2021</span>
+              </div>
+            </div>
+
+            <div class="guia-steps">
+              <div style="margin-bottom:24px">
+                <div class="sec-title" style="margin-bottom:4px">Pasos para realizar el trámite</div>
+                <p style="font-size:12px;color:var(--texto-sub)">Normativa: Ley 24.051 · Ley Prov. 5.394 · Res. ICAA 237/2021 y 240/2021</p>
+              </div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:#0D6B6B">1</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Quién debe inscribirse y qué documentación se necesita?</div>
+                  <div class="step-text">Deben inscribirse obligatoriamente todas las personas físicas o jurídicas que <strong>generen, transporten, traten o dispongan</strong> residuos peligrosos patológicos en la provincia: hospitales, clínicas, centros médicos, laboratorios, transportistas y operadores.</div>
+                  <div class="req-box">
+                    <div class="req-item"><span class="num">1</span>Formulario DDJJ de Generador de Residuos Peligrosos (Res. 240/21) — firmado por consultor registrado en ICAA — disponible en icaa.gov.ar</div>
+                    <div class="req-item"><span class="num">2</span>Formulario DDJJ de Transportista u Operador (Res. 240/21) — solo si aplica</div>
+                    <div class="req-item"><span class="num">3</span>Comprobante de pago Arancel ICAA — $13.752 (Res. 629/25) — transferencia a Banco Corrientes Cta. Cte. N° 130704/02</div>
+                    <div class="req-item"><span class="num">4</span>Comprobante de pago Sellado de Ley DGR Corrientes (puede realizarse en forma virtual en dgrcorrientes.gov.ar) — <em>solo privados</em></div>
+                    <div class="req-item"><span class="num">5</span>DNI / Personería jurídica del establecimiento (estatuto, acta, etc.) — copias certificadas</div>
+                    <div class="req-item"><span class="num">6</span>Constancia actualizada de inscripción AFIP (CUIT)</div>
+                    <div class="req-item"><span class="num">7</span>Constancia actualizada DGR Corrientes</div>
+                    <div class="req-item"><span class="num">8</span>Habilitación municipal del establecimiento</div>
+                    <div class="req-item"><span class="num">9</span>Descripción del sistema de gestión interna de residuos (generadores privados) — memoria descriptiva del circuito interno</div>
+                    <div class="req-item"><span class="num">10</span>Contrato con operador/transportista habilitado — si terceriza la gestión</div>
+                  </div>
+                  <div class="req-note">⚠️ <strong>Organismos públicos:</strong> están exentos del Sellado DGR y de la tasa de inicio de trámite. Solo abonan la tasa de certificación.</div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:#0D6B6B">2</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Cómo y dónde realizar el pago?</div>
+                  <div class="step-text"><strong>Paso A — Sellado de Ley DGR:</strong> puede realizarse en forma virtual en <strong>dgrcorrientes.gov.ar</strong> (solo aplica a privados).<br><br><strong>Paso B — Arancel ICAA ($13.752):</strong> transferencia bancaria al <strong>Banco de Corrientes S.A. Cta. Cte. N° 130704/02</strong>. Enviar comprobante con nombre completo / razón social / CUIT / tipo de trámite / teléfono / email a <strong>contable@icaa.gov.ar</strong></div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:#0D6B6B">3</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Dónde y cuándo se presenta la documentación?</div>
+                  <div class="step-text">Presentar toda la documentación en la <strong>Mesa de Entradas del ICAA</strong>. El personal verifica la completitud, caratula el expediente y lo deriva al Área de Residuos Peligrosos para evaluación técnica.</div>
+                  <div class="req-note">📍 <strong>Mesa de Entradas ICAA</strong> — Bolívar 2275, Corrientes Capital<br>⏰ Lunes a viernes de 07:30 a 13:00 hs<br>📧 consultas.icaa@corrientes.gob.ar · 📱 WhatsApp: 379-4255922</div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:#0D6B6B">4</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Qué recibo y en qué plazo?</div>
+                  <div class="step-text">El ICAA emite el <strong>Certificado de Inscripción en el Registro Provincial de Residuos Peligrosos</strong> y posteriormente la <strong>Resolución de Aprobación del Certificado Ambiental</strong>. Acreditan el cumplimiento de la normativa ambiental y otorgan respaldo legal para el ejercicio de la actividad. La inscripción <strong>no requiere renovación periódica</strong>.</div>
+                  <div class="plazo-row">
+                    <div class="plazo-item"><div class="plazo-n">$13.752</div><div class="plazo-l">Arancel ICAA</div></div>
+                    <div class="plazo-item"><div class="plazo-n">1–2</div><div class="plazo-l">Semanas hábiles</div></div>
+                    <div class="plazo-item"><div class="plazo-n">Única</div><div class="plazo-l">Inscripción sin renovación</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="guia-footer">
+              <div class="contact-item">📍 Bolívar 2275, Corrientes Capital</div>
+              <div class="contact-item">⏰ Lun–Vie 07:30–13:00 hs</div>
+              <div class="contact-item">📧 consultas.icaa@corrientes.gob.ar</div>
+              <div class="contact-item">📱 379-4255922</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ DETALLE: MCyP — FIRMA INTENDENTES ═══ -->
+        <div id="view-mcyp-firma" style="display:none">
+          <button class="back-btn" onclick="backToList()">← Volver a todas las guías</button>
+          <div class="guia-wrap">
+            <div class="guia-hero" style="background:linear-gradient(135deg,var(--azul-oscuro) 0%,var(--azul-medio) 100%)">
+              <div class="org-label">MCyP — Ministerio de Coordinación y Planificación · Provincia de Corrientes</div>
+              <h1>Certificación de Firma de Intendentes y Viceintendentes para Renovación de Licencia de Conducir</h1>
+              <p class="desc">Trámite mediante el cual intendentes y viceintendentes de municipios de la Provincia de Corrientes obtienen la certificación de su firma ante el Ministerio de Coordinación y Planificación, requisito indispensable para la renovación de la licencia de conducir en sus respectivas jurisdicciones.</p>
+              <div class="guia-meta">
+                <span class="meta-chip">🕐 En el momento</span>
+                <span class="meta-chip">📍 Presencial</span>
+                <span class="meta-chip">👤 Funcionarios municipales</span>
+              </div>
+            </div>
+
+            <div class="guia-steps">
+              <div style="margin-bottom:24px">
+                <div class="sec-title" style="margin-bottom:4px">Pasos para realizar el trámite</div>
+                <p style="font-size:12px;color:var(--texto-sub)">Exclusivo para Intendentes y Viceintendentes de municipios de la Provincia de Corrientes</p>
+              </div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:var(--azul-medio)">1</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Quién puede realizar este trámite y qué se necesita?</div>
+                  <div class="step-text">El trámite es exclusivo para <strong>Intendentes y Viceintendentes</strong> en ejercicio de municipios de la Provincia de Corrientes, que necesiten certificar su firma como parte del proceso de renovación de la licencia de conducir.</div>
+                  <div class="req-box">
+                    <div class="req-item"><span class="num">1</span>DNI vigente del titular (Intendente o Viceintendente)</div>
+                    <div class="req-item"><span class="num">2</span>Acreditación del cargo (constancia de asunción o credencial oficial del municipio)</div>
+                    <div class="req-item"><span class="num">3</span>Documentación de la licencia de conducir a renovar (licencia vencida o por vencer)</div>
+                    <div class="req-item"><span class="num">4</span>Nota o solicitud indicando el municipio, cargo y el motivo de la certificación</div>
+                  </div>
+                  <div class="req-note">ℹ️ Este trámite corresponde específicamente a la certificación de firma ante el MCyP para acreditar el cargo de autoridad municipal, como paso previo o complementario a la renovación de licencia.</div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:var(--azul-medio)">2</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Cómo y dónde presentarse?</div>
+                  <div class="step-text">Presentarse personalmente en el <strong>Ministerio de Coordinación y Planificación de la Provincia de Corrientes</strong>, en el área de certificaciones o mesa de entradas, con toda la documentación requerida. El funcionario deberá firmar ante el agente habilitado del Ministerio.</div>
+                  <div class="req-note">⏰ Horario de atención: <strong>Lunes a viernes de 07:30 a 13:00 hs</strong><br>Se recomienda coordinar previamente la visita comunicándose con el Ministerio.</div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:var(--azul-medio)">3</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Qué sucede en el momento de la atención?</div>
+                  <div class="step-text">El agente del Ministerio verifica la identidad y el cargo del solicitante, procede a la <strong>certificación de la firma</strong> y emite el instrumento correspondiente. El trámite es presencial e inmediato, sin instancias intermedias de evaluación.</div>
+                </div>
+              </div>
+              <div class="step-line"></div>
+
+              <div class="step">
+                <div><div class="step-num" style="background:var(--azul-medio)">4</div></div>
+                <div class="step-body">
+                  <div class="step-title">¿Qué recibo y cuándo?</div>
+                  <div class="step-text">Se emite la <strong>certificación de firma</strong> con el sello y la rúbrica del organismo habilitado del Ministerio. Este documento acredita el cargo y la autenticidad de la firma del funcionario, habilitando la continuación del proceso de renovación de la licencia de conducir en la jurisdicción correspondiente.</div>
+                  <div class="plazo-row">
+                    <div class="plazo-item"><div class="plazo-n">0</div><div class="plazo-l">Costo del trámite</div></div>
+                    <div class="plazo-item"><div class="plazo-n">1</div><div class="plazo-l">Visita necesaria</div></div>
+                    <div class="plazo-item"><div class="plazo-n">En el momento</div><div class="plazo-l">Tiempo de resolución</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="guia-footer">
+              <div class="contact-item">📍 Ministerio de Coordinación y Planificación — Corrientes Capital</div>
+              <div class="contact-item">⏰ Lun–Vie 07:30–13:00 hs</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /panel-guias -->
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+const TITLES = {
+  'resumen': ['Resumen General','Panel Provincial'],
+  'guias': ['Guías de Trámites','App de Trámites · Publicación Web']
+};
+
+function showPanel(id, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('tb-title').textContent = TITLES[id][0];
+  document.getElementById('tb-chip').textContent = TITLES[id][1];
+  // reset lista si va a guías
+  if(id==='guias') backToList();
+}
+
+function openTramite(id){
+  // activar panel guias si no está
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-guias').classList.add('active');
+  document.getElementById('tb-title').textContent = 'Guías de Trámites';
+  document.getElementById('tb-chip').textContent = 'App de Trámites · Publicación Web';
+
+  document.getElementById('view-lista').style.display='none';
+  document.querySelectorAll('[id^="view-"]').forEach(v=>{
+    if(v.id!=='view-lista') v.style.display='none';
+  });
+  const target = document.getElementById('view-'+id);
+  if(target) target.style.display='block';
+  window.scrollTo(0,0);
+  document.querySelector('.content').scrollTop=0;
+}
+
+function backToList(){
+  document.querySelectorAll('[id^="view-"]').forEach(v=>{
+    if(v.id==='view-lista') v.style.display='block';
+    else v.style.display='none';
+  });
+}
+
+function filterOrg(org){
+  document.querySelectorAll('.tramite-row').forEach(r=>{
+    r.style.display=(org==='TODOS'||r.dataset.org===org)?'flex':'none';
+  });
+  document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
